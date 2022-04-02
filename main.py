@@ -1,25 +1,25 @@
 import pygame
 import sys
-import os
 from pygame.locals import *
-from itertools import cycle
+import numpy as np
+
+IMG_SIZE = 600
+FPS = 1
+
+def get_surface_from_bitmap(bitmap):
+    scaled_bitmap = 255*bitmap
+    return pygame.surfarray.make_surface(scaled_bitmap)
 
 pygame.init()
 clock = pygame.time.Clock()
-screen = pygame.display.set_mode((600, 480))
+screen = pygame.display.set_mode((IMG_SIZE, IMG_SIZE))
 pygame.mouse.set_visible(0)
 pygame.display.set_caption('Larger than life')
-FPS = 1
-
-def load_image(filename):
-    return pygame.image.load(os.path.join("./src", filename))
-    
-bg = [load_image("background.png"), load_image("square.jpg"), load_image("square1.jpg")]
-backgrounds = cycle(bg)
 
 while True:
     clock.tick(FPS)
-    background = next(backgrounds)
+    bitmap = np.round(np.random.random((IMG_SIZE,IMG_SIZE)))
+    background = get_surface_from_bitmap(bitmap)
     screen.blit(background, (0, 0))
     pygame.display.update()
 
