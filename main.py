@@ -1,10 +1,7 @@
 import pygame
 import sys
 from pygame.locals import *
-import numpy as np
-from scene import Scene
-from menu import Menu
-from game import Game
+from scenes import Scene, Menu, Game
 
 IMG_SIZE = 600
 FPS = 1

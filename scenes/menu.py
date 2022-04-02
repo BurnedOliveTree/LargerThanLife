@@ -1,7 +1,6 @@
 import pygame
-from components import Button, InputTextBox
-from scene import Scene
-import sys
+from scenes import Scene
+from scenes.components import Button, InputTextBox
 
 class Menu():
     def __init__(self, window_size):
