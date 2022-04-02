@@ -1,4 +1,2 @@
 # GameOfLife
-
-
-https://www.geeksforgeeks.org/how-to-create-a-text-input-box-with-pygame/
+https://stackoverflow.com/questions/63801960/how-to-prompt-user-to-open-a-file-with-python3-pygame

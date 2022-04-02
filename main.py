@@ -2,11 +2,17 @@ import pygame
 import sys
 from pygame.locals import *
 import numpy as np
+from enum import Enum
 from InputTextBox import InputTextBox
+from Button import Button
 
 IMG_SIZE = 600
 FPS = 1
-FONT_SIZE = 30
+
+class Scene(Enum):
+    MENU = 0
+    GAME = 1
+
 def get_surface_from_bitmap(bitmap):
     scaled_bitmap = 255*bitmap
     return pygame.surfarray.make_surface(scaled_bitmap)
@@ -30,24 +36,49 @@ inputTextBox = InputTextBox(
     active_color=pygame.Color('lightblue'), 
     passive_color=pygame.Color('blue'))
 
-while True:
-    # clock.tick(FPS)
-    # bitmap = np.round(np.random.random((IMG_SIZE,IMG_SIZE)))
-    # background = get_surface_from_bitmap(bitmap)
-    # screen.blit(background, (0, 0))
-    # pygame.display.update()
+button = Button(
+    text="Start game",
+    invoke_scene_name=Scene.GAME,
+    width=100,
+    height=50,
+    coordinates=(IMG_SIZE*3//4, IMG_SIZE*3//4),
+    active_color=pygame.Color('lightblue'), 
+    passive_color=pygame.Color('blue'))
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            sys.exit()
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            inputTextBox.set_status(event.pos)
-        if event.type == pygame.KEYDOWN  and inputTextBox.is_active == True:
-            inputTextBox.get_text_after_event(event)
 
-    screen.fill((0,0,0))
-    draw_title(screen)
-    inputTextBox.draw(screen)
-    pygame.display.flip()
-    clock.tick(60)
-        
+def menu(screen):
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                inputTextBox.set_status(event.pos)
+                screen = button.set_status(event.pos)
+                if screen != None:
+                    return screen
+            if event.type == pygame.KEYDOWN  and inputTextBox.is_active == True:
+                inputTextBox.get_text_after_event(event)
+
+        screen.fill((0,0,0))
+        draw_title(screen)
+        inputTextBox.draw(screen)
+        button.draw(screen)
+        pygame.display.flip()
+        clock.tick(FPS)
+
+def game(screen):
+    while True:
+        clock.tick(FPS)
+        bitmap = np.round(np.random.random((IMG_SIZE,IMG_SIZE)))
+        background = get_surface_from_bitmap(bitmap)
+        screen.blit(background, (0, 0))
+        pygame.display.update()
+
+
+if __name__ == "__main__":
+    scene = Scene.MENU
+    while True:
+        if scene == Scene.MENU:
+            scene = menu(screen)
+        elif scene == Scene.GAME:
+            scene = game(screen)
