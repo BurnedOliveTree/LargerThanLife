@@ -17,8 +17,8 @@ class Menu(Window):
 
         self.start_game_button = Button(
             text="Start game",
-            width=100,
-            height=50,
+            width=None,
+            height=None,
             coordinates=(
                 (self.window_size // 2) - 50,
                 (self.window_size * 3 // 4) - 25,
