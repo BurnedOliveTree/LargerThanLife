@@ -41,11 +41,11 @@ class Menu:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     self.input_text_box.set_status(event.pos)
                     game_screen = self.start_game_button.set_status(event.pos)
-                    if game_screen != None:
+                    if game_screen is not None:
                         return game_screen
                 if (
                     event.type == pygame.KEYDOWN
-                    and self.input_text_box.is_active == True
+                    and self.input_text_box.is_active is True
                 ):
                     self.input_text_box.get_text_after_event(event)
 

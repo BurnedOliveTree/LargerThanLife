@@ -1,6 +1,5 @@
 import pygame
 import sys
-from pygame.locals import *
 from scenes import Scene, Menu, Game
 
 IMG_SIZE = 600
@@ -21,5 +20,5 @@ if __name__ == "__main__":
             scene = menu.render(screen, clock, FPS)
         elif scene == Scene.GAME:
             scene = game.render(screen, clock, FPS)
-        elif scene == None:
+        elif scene is None:
             sys.exit()
