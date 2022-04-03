@@ -46,9 +46,10 @@ class InputTextBox:
 
     def draw(self, screen):
         self.draw_description(screen)
+        text_surface = self.font.render(self.text, True, (255, 255, 255))
+        
         self.change_color()
         pygame.draw.rect(screen, self.color, self.input_rect, 5)
-        text_surface = self.font.render(self.text, True, (255, 255, 255))
         screen.blit(text_surface, (self.input_rect.x + 10, self.input_rect.y + 10))
         # self.input_rect.w = max(text_surface.get_width() + 20, 100)
 

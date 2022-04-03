@@ -15,7 +15,6 @@ class Menu(Window):
 
         self.start_game_button = Button(
             text="Start game",
-            invoke_scene_name=Scene.GAME,
             width=100,
             height=50,
             coordinates=(
@@ -24,6 +23,7 @@ class Menu(Window):
             ),
             active_color=pygame.Color("lightblue"),
             passive_color=pygame.Color("blue"),
+            invoke_scene_name=Scene.GAME
         )
 
     def draw_title(self, screen):
