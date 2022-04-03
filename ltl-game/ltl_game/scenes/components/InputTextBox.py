@@ -3,8 +3,6 @@ import pygame
 
 
 class InputTextBox(Component):
-    text_width = 100
-
     def __init__(
         self, width, height, coordinates, active_color, passive_color, description
     ):
@@ -18,16 +16,14 @@ class InputTextBox(Component):
             description_surface,
             (
                 self.coordinates[0] - description_width,
-                self.coordinates[1] + (self.rect.h // 4),
+                self.coordinates[1],
             ),
         )
 
     def draw(self, screen):
         self.draw_description(screen)
         text_surface = self.font.render(self.text, True, self.text_color)
-        self.rect.w = max(
-            text_surface.get_width() + Component.padding, InputTextBox.text_width
-        )
+        self.rect.w = max(text_surface.get_width() + Component.padding, self.width)
 
         self.change_color()
         pygame.draw.rect(screen, self.color, self.rect, Component.border_width)
