@@ -13,12 +13,12 @@ pygame.display.set_caption("Larger than life")
 
 if __name__ == "__main__":
     scene = Scene.MENU
-    menu = Menu(IMG_SIZE)
-    game = Game(IMG_SIZE)
+    menu = Menu(IMG_SIZE, FPS)
+    game = Game(IMG_SIZE, FPS)
     while True:
         if scene == Scene.MENU:
-            scene = menu.render(screen, clock, FPS)
+            scene = menu.render(screen, clock)
         elif scene == Scene.GAME:
-            scene = game.render(screen, clock, FPS)
+            scene = game.render(screen, clock)
         elif scene is None:
             sys.exit()

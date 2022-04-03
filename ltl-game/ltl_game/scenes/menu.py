@@ -1,11 +1,11 @@
 import pygame
-from scenes import Scene
+from scenes import Scene, Window
 from scenes.components import Button, InputTextBox
 
 
-class Menu:
-    def __init__(self, window_size):
-        self.window_size = window_size
+class Menu(Window):
+    def __init__(self, window_size, FPS):
+        super().__init__(window_size, FPS)
         self.input_text_box = InputTextBox(
             description="Enter notation params: ",
             coordinates=(self.window_size // 2, self.window_size // 2),
@@ -33,7 +33,7 @@ class Menu:
         text_rect.center = (self.window_size // 2, self.window_size // 3)
         screen.blit(text, text_rect)
 
-    def render(self, screen, clock, FPS):
+    def render(self, screen, clock):
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -53,5 +53,6 @@ class Menu:
             self.draw_title(screen)
             self.input_text_box.draw(screen)
             self.start_game_button.draw(screen)
+
             pygame.display.flip()
-            clock.tick(FPS)
+            clock.tick(self.FPS)
