@@ -7,10 +7,12 @@ class Menu(Window):
     def __init__(self, window_size, FPS):
         super().__init__(window_size, FPS)
         self.input_text_box = InputTextBox(
-            description="Enter notation params: ",
+            width=100,
+            height=50,
             coordinates=(self.window_size // 2, self.window_size // 2),
             active_color=pygame.Color("lightblue"),
             passive_color=pygame.Color("blue"),
+            description="Enter notation params: ",
         )
 
         self.start_game_button = Button(
@@ -23,7 +25,7 @@ class Menu(Window):
             ),
             active_color=pygame.Color("lightblue"),
             passive_color=pygame.Color("blue"),
-            invoke_scene_name=Scene.GAME
+            invoke_scene_name=Scene.GAME,
         )
 
     def draw_title(self, screen):

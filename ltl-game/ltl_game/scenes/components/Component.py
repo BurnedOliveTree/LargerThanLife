@@ -22,7 +22,7 @@ class Component:
 
         self.font = pygame.font.Font(None, 30)
         self.text_surface = self.font.render(self.text, True, pygame.Color("white"))
-        
+
         self.rect = pygame.Rect(coordinates[0], coordinates[1], width, height)
         self.rect.w = max(self.text_surface.get_width() * 3 // 2, 100)
 
@@ -36,7 +36,6 @@ class Component:
             self.is_active = True
         else:
             self.is_active = False
-            return None
 
     def change_color(self):
         if self.is_active:

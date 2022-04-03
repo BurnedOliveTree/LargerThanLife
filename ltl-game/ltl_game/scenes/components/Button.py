@@ -1,5 +1,6 @@
 from scenes.components.Component import Component
 
+
 class Button(Component):
     def __init__(
         self,
@@ -9,7 +10,7 @@ class Button(Component):
         coordinates,
         active_color,
         passive_color,
-        invoke_scene_name
+        invoke_scene_name,
     ):
         super().__init__(text, width, height, coordinates, active_color, passive_color)
         self.invoke_scene_name = invoke_scene_name
@@ -20,4 +21,4 @@ class Button(Component):
             return self.invoke_scene_name
         else:
             self.is_active = False
-            return None 
+            return None

@@ -1,23 +1,15 @@
+from scenes.components.Component import Component
 import pygame
 
 
-class InputTextBox:
-    def __init__(self, description, coordinates, active_color, passive_color):
-        self.input_rect_height = 40
+class InputTextBox(Component):
+    input_rect_height = 40
+
+    def __init__(
+        self, width, height, coordinates, active_color, passive_color, description
+    ):
+        super().__init__("", width, height, coordinates, active_color, passive_color)
         self.description = description
-        self.input_rect = pygame.Rect(
-            coordinates[0],
-            coordinates[1] - self.input_rect_height,
-            150,
-            self.input_rect_height,
-        )
-        self.coordinates = coordinates
-        self.active_color = active_color
-        self.passive_color = passive_color
-        self.color = self.passive_color
-        self.is_active = False
-        self.font = pygame.font.Font(None, 30)
-        self.text = ""
 
     def draw_description(self, screen):
         description_surface = self.font.render(
@@ -32,26 +24,14 @@ class InputTextBox:
             ),
         )
 
-    def change_color(self):
-        if self.is_active:
-            self.color = self.active_color
-        else:
-            self.color = self.passive_color
-
-    def set_status(self, position):
-        if self.input_rect.collidepoint(position):
-            self.is_active = True
-        else:
-            self.is_active = False
-
     def draw(self, screen):
         self.draw_description(screen)
         text_surface = self.font.render(self.text, True, (255, 255, 255))
-        
+        self.rect.w = max(text_surface.get_width() + 20, 100)
+
         self.change_color()
-        pygame.draw.rect(screen, self.color, self.input_rect, 5)
-        screen.blit(text_surface, (self.input_rect.x + 10, self.input_rect.y + 10))
-        # self.input_rect.w = max(text_surface.get_width() + 20, 100)
+        pygame.draw.rect(screen, self.color, self.rect, 5)
+        screen.blit(text_surface, (self.rect.x + 10, self.rect.y + 10))
 
     def get_text_after_event(self, event):
         if event.key == pygame.K_BACKSPACE:
