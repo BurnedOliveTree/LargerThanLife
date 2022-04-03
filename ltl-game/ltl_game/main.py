@@ -10,7 +10,7 @@ pygame.init()
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((IMG_SIZE, IMG_SIZE))
 pygame.mouse.set_visible(1)
-pygame.display.set_caption('Larger than life')
+pygame.display.set_caption("Larger than life")
 
 if __name__ == "__main__":
     scene = Scene.MENU
