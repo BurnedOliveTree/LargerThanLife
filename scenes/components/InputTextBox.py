@@ -35,11 +35,11 @@ class InputTextBox:
         self.change_color()
         pygame.draw.rect(screen, self.color, self.input_rect, 5)
         text_surface = self.font.render(self.text, True, (255, 255, 255))
-        screen.blit(text_surface, (self.input_rect.x + 10, self.input_rect.y+10))
-        self.input_rect.w = max(text_surface.get_width() + 20, 100)
+        screen.blit(text_surface, (self.input_rect.x+10, self.input_rect.y+10))
+        # self.input_rect.w = max(text_surface.get_width() + 20, 100)
     
     def get_text_after_event(self, event):
-        if event.type == pygame.K_BACKSPACE:
+        if event.key == pygame.K_BACKSPACE:
             self.text = self.text[:-1]
         else:
             self.text += event.unicode 
