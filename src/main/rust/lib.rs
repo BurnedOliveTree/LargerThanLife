@@ -1,15 +1,17 @@
 use pyo3::prelude::*;
 use rand::{distributions::Uniform, Rng};
+use std::fs;
+use serde::Deserialize;
 
 #[pyclass]
-#[derive(Clone)]
+#[derive(Deserialize, Debug, Clone)]
 enum Neighbourhood {
     Moore,
     VonNeumann,
 }
 
 #[pyclass]
-#[derive(Clone)]
+#[derive(Deserialize, Debug, Clone)]
 struct Rules {
     cell: u8,
     range: u8,
@@ -32,9 +34,29 @@ impl Rules {
 
     #[staticmethod]
     fn parse(user_input: &str, path: &str) -> Self {
-        // TODO implement
-        println!("{} {}", user_input, path);
-        return Rules { cell: 2, range: 2, survival: 2, birth: 2, neighbourhood: Neighbourhood::Moore }
+        if !path.is_empty() && fs::metadata(path).is_ok() {
+            let json_rules = fs::read_to_string(path).unwrap();
+            let rules: Rules = serde_json::from_str(&json_rules).unwrap();
+            return rules;
+        } else if !user_input.is_empty() {
+            let values: Vec<&str> = user_input.split([';', ':']).collect();
+            // "C:10;R:8;S:5;B:1;N:'M'"
+            let get_rule = |rule_acronym: &str| -> u8 { values[values.iter().position(|&x| x == rule_acronym).unwrap() + 1].parse::<u8>().unwrap() };
+            return Rules { 
+                cell: get_rule("C"), 
+                range: get_rule("R"), 
+                survival: get_rule("S"), 
+                birth: get_rule("B"), 
+                neighbourhood: Neighbourhood::Moore 
+            };
+        }
+        return Rules { 
+            cell: 2, 
+            range: 2, 
+            survival: 2, 
+            birth: 2, 
+            neighbourhood: Neighbourhood::Moore 
+        };
     }
 }
 
