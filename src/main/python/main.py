@@ -1,6 +1,7 @@
 import pygame
 import sys
 from scenes import Scene, Menu, Game
+import rust
 
 IMG_SIZE = 600
 FPS = 1
@@ -12,6 +13,7 @@ pygame.mouse.set_visible(1)
 pygame.display.set_caption("Larger than life")
 
 if __name__ == "__main__":
+    print(rust.sum_as_string(3, 4))
     scene = Scene.MENU
     menu = Menu(IMG_SIZE, FPS)
     game = Game(IMG_SIZE, FPS)
