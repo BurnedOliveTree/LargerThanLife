@@ -1,13 +1,16 @@
 import pygame
 import numpy as np
 from scenes import Window
-import rust
+from rust import Engine, Rules
 
 
 class Game(Window):
     def __init__(self, window_size, FPS):
         super().__init__(window_size, FPS)
-        self.rust_game = rust.Game(2, 2, 2, 2, rust.Neighbourhood.Moore)
+        self.engine = None
+
+    def set_rules(self, rules: Rules):
+        self.engine = Engine(rules)
 
     def get_surface_from_bitmap(self, bitmap):
         scaled_color_bitmap = 255 * bitmap
@@ -23,7 +26,7 @@ class Game(Window):
                 if event.type == pygame.QUIT:
                     return None
 
-            pre_bitmap = self.rust_game.generate_image(self.window_size)
+            pre_bitmap = self.engine.generate_image(self.window_size)
             bitmap = np.array([np.array(xi) for xi in pre_bitmap])
             background = self.get_surface_from_bitmap(bitmap)
             screen.blit(background, (0, 0))

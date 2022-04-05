@@ -9,7 +9,8 @@ enum Neighbourhood {
 }
 
 #[pyclass]
-struct Game {
+#[derive(Clone)]
+struct Rules {
     cell: u8,
     range: u8,
     survival: u64,
@@ -17,11 +18,31 @@ struct Game {
     neighbourhood: Neighbourhood
 }
 
+#[pyclass]
+struct Engine {
+    rules: Rules
+}
+
 #[pymethods]
-impl Game {
+impl Rules {
     #[new]
     fn new(cell: u8, range: u8, survival: u64, birth: u64, neighbourhood: Neighbourhood) -> Self {
-        Game { cell, range, survival, birth, neighbourhood }
+        Rules { cell, range, survival, birth, neighbourhood }
+    }
+
+    #[staticmethod]
+    fn parse(user_input: &str, path: &str) -> Self {
+        // TODO implement
+        println!("{} {}", user_input, path);
+        return Rules { cell: 2, range: 2, survival: 2, birth: 2, neighbourhood: Neighbourhood::Moore }
+    }
+}
+
+#[pymethods]
+impl Engine {
+    #[new]
+    fn new(rules: Rules) -> Self {
+        Engine { rules }
     }
 
     fn generate_image(&self, window_size: u16) -> Vec<Vec<u64>> {
@@ -34,6 +55,7 @@ impl Game {
 #[pymodule]
 fn rust(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<Neighbourhood>()?;
-    m.add_class::<Game>()?;
+    m.add_class::<Rules>()?;
+    m.add_class::<Engine>()?;
     Ok(())
 }
