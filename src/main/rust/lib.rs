@@ -2,6 +2,7 @@ use pyo3::prelude::*;
 use rand::{distributions::Uniform, Rng};
 use std::fs;
 use serde::Deserialize;
+use tuple_transpose::TupleTranspose;
 
 #[pyclass]
 #[derive(Deserialize, Debug, Clone)]
@@ -13,32 +14,31 @@ enum Neighbourhood {
 #[pyclass]
 #[derive(Deserialize, Debug, Clone)]
 struct Rules {
-    #[pyo3(get)] cell: u8,
-    #[pyo3(get)] range: u8,
-    #[pyo3(get)] survival: (u64, u64),
-    #[pyo3(get)] birth: (u64, u64),
-    #[pyo3(get)] neighbourhood: Neighbourhood
+    cell: u8,
+    range: u8,
+    survival: (u64, u64),
+    birth: (u64, u64),
+    neighbourhood: Neighbourhood
 }
 
 #[pyclass]
 #[derive(Debug, Clone)]
 struct Engine {
-    #[pyo3(get)] rules: Rules,
-    #[pyo3(get)] board: Vec<Vec<u8>>
+    rules: Rules,
+    board: Vec<Vec<u8>>
 }
 
 trait RangeParser {
-    fn parse_range(&self) -> (u64, u64);
+    fn parse_range(&self) -> Result<(u64, u64), std::num::ParseIntError>;
 }
 
 impl RangeParser for &str {
-    fn parse_range(&self) -> (u64, u64) {
+    fn parse_range(&self) -> Result<(u64, u64), std::num::ParseIntError> {
         if self.contains('-') {
             let (value1, value2) = self.split_once('-').unwrap();
-            return ((value1.parse::<u64>().unwrap()), (value2.parse::<u64>().unwrap()));
+            return (value1.parse::<u64>(), value2.parse::<u64>()).transpose();
         } else {
-            let value = self.parse::<u64>().unwrap();
-            return (value, value);
+            return (self.parse::<u64>(), self.parse::<u64>()).transpose();
         }
     }
 }
@@ -66,8 +66,8 @@ impl Rules {
             return Rules { 
                 cell: get_rule("C").parse::<u8>().unwrap(), 
                 range: get_rule("R").parse::<u8>().unwrap(), 
-                survival: get_rule("S").parse_range(), 
-                birth: get_rule("B").parse_range(), 
+                survival: get_rule("S").parse_range().unwrap(), 
+                birth: get_rule("B").parse_range().unwrap(), 
                 neighbourhood: Neighbourhood::Moore 
             };
         }
