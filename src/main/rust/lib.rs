@@ -13,31 +13,32 @@ enum Neighbourhood {
 #[pyclass]
 #[derive(Deserialize, Debug, Clone)]
 struct Rules {
-    cell: u8,
-    range: u8,
-    survival: std::ops::Range<u64>,
-    birth: std::ops::Range<u64>,
-    neighbourhood: Neighbourhood
+    #[pyo3(get)] cell: u8,
+    #[pyo3(get)] range: u8,
+    #[pyo3(get)] survival: (u64, u64),
+    #[pyo3(get)] birth: (u64, u64),
+    #[pyo3(get)] neighbourhood: Neighbourhood
 }
 
 #[pyclass]
+#[derive(Debug, Clone)]
 struct Engine {
-    rules: Rules,
-    board: [[f64; 600]; 600]
+    #[pyo3(get)] rules: Rules,
+    #[pyo3(get)] board: Vec<Vec<u8>>
 }
 
 trait RangeParser {
-    fn parse_range(&self) -> std::ops::Range<u64>;
+    fn parse_range(&self) -> (u64, u64);
 }
 
 impl RangeParser for &str {
-    fn parse_range(&self) -> std::ops::Range<u64> {
+    fn parse_range(&self) -> (u64, u64) {
         if self.contains('-') {
             let (value1, value2) = self.split_once('-').unwrap();
-            return (value1.parse::<u64>().unwrap())..(value2.parse::<u64>().unwrap());
+            return ((value1.parse::<u64>().unwrap()), (value2.parse::<u64>().unwrap()));
         } else {
             let value = self.parse::<u64>().unwrap();
-            return value..value;
+            return (value, value);
         }
     }
 }
@@ -46,7 +47,7 @@ impl RangeParser for &str {
 impl Rules {
     #[new]
     fn new(cell: u8, range: u8, survival: (u64, u64), birth: (u64, u64), neighbourhood: Neighbourhood) -> Self {
-        Rules { cell, range, survival: survival.0..(survival.1+1), birth: birth.0..(birth.1+1), neighbourhood }
+        Rules { cell, range, survival, birth, neighbourhood }
     }
 
     #[staticmethod]
@@ -73,8 +74,8 @@ impl Rules {
         return Rules { 
             cell: 2, 
             range: 1, 
-            survival: 2..3, 
-            birth: 3..3, 
+            survival: (2, 3), 
+            birth: (3, 3), 
             neighbourhood: Neighbourhood::Moore 
         };
     }
@@ -84,7 +85,7 @@ impl Rules {
 impl Engine {
     #[new]
     fn new(rules: Rules) -> Self {
-        Engine { rules, board: [[0.0; 600]; 600] }
+        Engine { rules, board: vec![vec![0; 600]; 600] }
     }
 
     fn generate_image(&self, window_size: u16) -> Vec<Vec<u64>> {
