@@ -15,21 +15,38 @@ enum Neighbourhood {
 struct Rules {
     cell: u8,
     range: u8,
-    survival: u64,
-    birth: u64,
+    survival: std::ops::Range<u64>,
+    birth: std::ops::Range<u64>,
     neighbourhood: Neighbourhood
 }
 
 #[pyclass]
 struct Engine {
-    rules: Rules
+    rules: Rules,
+    board: [[f64; 600]; 600]
+}
+
+trait RangeParser {
+    fn parse_range(&self) -> std::ops::Range<u64>;
+}
+
+impl RangeParser for &str {
+    fn parse_range(&self) -> std::ops::Range<u64> {
+        if self.contains('-') {
+            let (value1, value2) = self.split_once('-').unwrap();
+            return (value1.parse::<u64>().unwrap())..(value2.parse::<u64>().unwrap());
+        } else {
+            let value = self.parse::<u64>().unwrap();
+            return value..value;
+        }
+    }
 }
 
 #[pymethods]
 impl Rules {
     #[new]
-    fn new(cell: u8, range: u8, survival: u64, birth: u64, neighbourhood: Neighbourhood) -> Self {
-        Rules { cell, range, survival, birth, neighbourhood }
+    fn new(cell: u8, range: u8, survival: (u64, u64), birth: (u64, u64), neighbourhood: Neighbourhood) -> Self {
+        Rules { cell, range, survival: survival.0..(survival.1+1), birth: birth.0..(birth.1+1), neighbourhood }
     }
 
     #[staticmethod]
@@ -39,22 +56,25 @@ impl Rules {
             let rules: Rules = serde_json::from_str(&json_rules).unwrap();
             return rules;
         } else if !user_input.is_empty() {
-            let values: Vec<&str> = user_input.split([';', ':']).collect();
             // "C:10;R:8;S:5;B:1;N:'M'"
-            let get_rule = |rule_acronym: &str| -> u8 { values[values.iter().position(|&x| x == rule_acronym).unwrap() + 1].parse::<u8>().unwrap() };
+            let values: std::collections::HashMap<&str, &str> = user_input
+                .split(';')
+                .map(|element| element.split_once(':').unwrap())
+                .collect();
+            let get_rule = |rule_acronym: &str| -> &str { values.get(rule_acronym).unwrap() };
             return Rules { 
-                cell: get_rule("C"), 
-                range: get_rule("R"), 
-                survival: get_rule("S"), 
-                birth: get_rule("B"), 
+                cell: get_rule("C").parse::<u8>().unwrap(), 
+                range: get_rule("R").parse::<u8>().unwrap(), 
+                survival: get_rule("S").parse_range(), 
+                birth: get_rule("B").parse_range(), 
                 neighbourhood: Neighbourhood::Moore 
             };
         }
         return Rules { 
             cell: 2, 
-            range: 2, 
-            survival: 2, 
-            birth: 2, 
+            range: 1, 
+            survival: 2..3, 
+            birth: 3..3, 
             neighbourhood: Neighbourhood::Moore 
         };
     }
@@ -64,7 +84,7 @@ impl Rules {
 impl Engine {
     #[new]
     fn new(rules: Rules) -> Self {
-        Engine { rules }
+        Engine { rules, board: [[0.0; 600]; 600] }
     }
 
     fn generate_image(&self, window_size: u16) -> Vec<Vec<u64>> {
