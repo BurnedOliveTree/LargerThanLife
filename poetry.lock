@@ -90,6 +90,21 @@ flake8 = ">=3.0.0"
 dev = ["coverage", "hypothesis", "hypothesmith (>=0.2)", "pre-commit"]
 
 [[package]]
+name = "maturin"
+version = "0.12.11"
+description = "Build and publish crates with pyo3, rust-cpython and cffi bindings as well as rust binaries as python packages"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+tomli = {version = ">=1.1.0", markers = "python_version < \"3.11\""}
+
+[package.extras]
+patchelf = ["patchelf"]
+zig = ["ziglang (>=0.9.0,<0.10.0)"]
+
+[[package]]
 name = "mccabe"
 version = "0.6.1"
 description = "McCabe checker, plugin for flake8"
@@ -232,7 +247,7 @@ testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xm
 name = "tomli"
 version = "2.0.1"
 description = "A lil' TOML parser"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -255,7 +270,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "69eaf88b57f750b09df7a0c2528eae29e692c0e34930ac535d0ab758202860dc"
+content-hash = "71aca0797ea65abfe80df65a0b1ca438372e7c44c0460beaddf962803bc61d23"
 
 [metadata.files]
 atomicwrites = [
@@ -306,6 +321,25 @@ flake8 = [
 flake8-bugbear = [
     {file = "flake8-bugbear-22.3.23.tar.gz", hash = "sha256:e0dc2a36474490d5b1a2d57f9e4ef570abc09f07cbb712b29802e28a2367ff19"},
     {file = "flake8_bugbear-22.3.23-py3-none-any.whl", hash = "sha256:ec5ec92195720cee1589315416b844ffa5e82f73a78e65329e8055322df1e939"},
+]
+maturin = [
+    {file = "maturin-0.12.11-py3-none-macosx_10_7_x86_64.whl", hash = "sha256:1c3053dccc099c864e9d3fa4ff4d0bfa38e9f6a654efc6d5892eb49839153e1d"},
+    {file = "maturin-0.12.11-py3-none-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:78fb1a9d9de79cac91fc9bf5dfba20e958ff3d82434e34fac6a4712b87ec450d"},
+    {file = "maturin-0.12.11-py3-none-manylinux_2_12_i686.manylinux2010_i686.whl", hash = "sha256:553d70f4723d3ee35d0ba85887e15e3d5dadedad4479210d647570b6691e9e04"},
+    {file = "maturin-0.12.11-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:e3aace6694fabeb2f2d255d0700a148466cff51ce8de9e5bae4f6e750be3a351"},
+    {file = "maturin-0.12.11-py3-none-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:b0eb74b80d94884c9bce0a928c991269ae7a74e77aa396d6275e5486e08a0bd5"},
+    {file = "maturin-0.12.11-py3-none-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:3b9c19937c7c9b2c1a71b177ff3c30f7d97d30e03cf8f471a3f953715e425028"},
+    {file = "maturin-0.12.11-py3-none-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:86199180876d361d582207dd10ced857c3a2d4962cf5d9c6a37b2c38fa642ca5"},
+    {file = "maturin-0.12.11-py3-none-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:539a72aa92cb58549c94abaa18facc1a01b172072315bdcb3b98588f6f3de92a"},
+    {file = "maturin-0.12.11-py3-none-musllinux_1_1_aarch64.whl", hash = "sha256:b6690010cd9f4c1c2994a2ff567709b868da10289749feaed55bcc393021c62f"},
+    {file = "maturin-0.12.11-py3-none-musllinux_1_1_armv7l.whl", hash = "sha256:55be28fa6eab92cccd10e70755e78f558f46cc643351144aa8a7c03d88d55806"},
+    {file = "maturin-0.12.11-py3-none-musllinux_1_1_i686.whl", hash = "sha256:9bbaed7d7a0ac59cd243a29be21e60f1c7c34d318c8e52ffb484c471b1e7b529"},
+    {file = "maturin-0.12.11-py3-none-musllinux_1_1_ppc64le.whl", hash = "sha256:bded1a9d9dcf010931ff00b371795f047ed48bd6a978ef25db5afd1128e70c58"},
+    {file = "maturin-0.12.11-py3-none-musllinux_1_1_x86_64.whl", hash = "sha256:88bbd57604efa2416f7318207e8d9771215e0aaf9aa325682edcf0680bb5d555"},
+    {file = "maturin-0.12.11-py3-none-win32.whl", hash = "sha256:fe9ed13c58e57bfd719fca902f4ed7fd5339694667a36c6ac79379008a391967"},
+    {file = "maturin-0.12.11-py3-none-win_amd64.whl", hash = "sha256:1622708ce62de9da24c774992642715d133c8c51e5ab8cd676d4d38766a27f83"},
+    {file = "maturin-0.12.11-py3-none-win_arm64.whl", hash = "sha256:27dccb5a473511c3187e51399f563537e85d2cb9c4fed672c08e540a9abca634"},
+    {file = "maturin-0.12.11.tar.gz", hash = "sha256:8602d28df0312ca703fea6eb347d37aa511342fc32234b6d6b73053b66fcdf26"},
 ]
 mccabe = [
     {file = "mccabe-0.6.1-py2.py3-none-any.whl", hash = "sha256:ab8a6258860da4b6677da4bd2fe5dc2c659cff31b3ee4f7f5d64e79735b80d42"},

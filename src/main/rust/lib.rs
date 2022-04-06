@@ -1,40 +1,85 @@
 use pyo3::prelude::*;
 use rand::{distributions::Uniform, Rng};
+use std::fs;
+use serde::Deserialize;
+use tuple_transpose::TupleTranspose;
 
 #[pyclass]
-#[derive(Clone)]
+#[derive(Deserialize, Debug, Clone)]
 enum Neighbourhood {
     Moore,
     VonNeumann,
 }
 
 #[pyclass]
-#[derive(Clone)]
+#[derive(Deserialize, Debug, Clone)]
 struct Rules {
     cell: u8,
     range: u8,
-    survival: u64,
-    birth: u64,
+    survival: (u64, u64),
+    birth: (u64, u64),
     neighbourhood: Neighbourhood
 }
 
 #[pyclass]
+#[derive(Debug, Clone)]
 struct Engine {
-    rules: Rules
+    rules: Rules,
+    board: Vec<Vec<u8>>
+}
+
+trait RangeParser {
+    fn parse_range(&self) -> Result<(u64, u64), std::num::ParseIntError>;
+}
+
+impl RangeParser for &str {
+    fn parse_range(&self) -> Result<(u64, u64), std::num::ParseIntError> {
+        if self.contains('-') {
+            let (value1, value2) = self.split_once('-').unwrap();
+            return (value1.parse::<u64>(), value2.parse::<u64>()).transpose();
+        } else {
+            return (self.parse::<u64>(), self.parse::<u64>()).transpose();
+        }
+    }
 }
 
 #[pymethods]
 impl Rules {
     #[new]
-    fn new(cell: u8, range: u8, survival: u64, birth: u64, neighbourhood: Neighbourhood) -> Self {
+    fn new(cell: u8, range: u8, survival: (u64, u64), birth: (u64, u64), neighbourhood: Neighbourhood) -> Self {
         Rules { cell, range, survival, birth, neighbourhood }
     }
 
     #[staticmethod]
     fn parse(user_input: &str, path: &str) -> Self {
-        // TODO implement
-        println!("{} {}", user_input, path);
-        return Rules { cell: 2, range: 2, survival: 2, birth: 2, neighbourhood: Neighbourhood::Moore }
+        let default_rules = Rules {
+            cell: 2,
+            range: 1,
+            survival: (2, 3),
+            birth: (3, 3),
+            neighbourhood: Neighbourhood::Moore
+        };
+
+        if !path.is_empty() && fs::metadata(path).is_ok() {
+            let json_rules = fs::read_to_string(path).unwrap();
+            let rules: Rules = serde_json::from_str(&json_rules).unwrap_or(default_rules);
+            return rules;
+        } else if !user_input.is_empty() {
+            // "C:10;R:8;S:5;B:1;N:'M'"
+            let values: std::collections::HashMap<&str, &str> = user_input
+                .split(';')
+                .map(|element| element.split_once(':').unwrap())
+                .collect();
+            let get_rule = |rule_acronym: &str| -> &str { values.get(rule_acronym).unwrap() };
+            return Rules { 
+                cell: get_rule("C").parse::<u8>().unwrap_or(default_rules.cell),
+                range: get_rule("R").parse::<u8>().unwrap_or(default_rules.range),
+                survival: get_rule("S").parse_range().unwrap_or(default_rules.survival),
+                birth: get_rule("B").parse_range().unwrap_or(default_rules.birth),
+                neighbourhood: default_rules.neighbourhood
+            };
+        }
+        return default_rules;
     }
 }
 
@@ -42,7 +87,7 @@ impl Rules {
 impl Engine {
     #[new]
     fn new(rules: Rules) -> Self {
-        Engine { rules }
+        Engine { rules, board: vec![vec![0; 600]; 600] }
     }
 
     fn generate_image(&self, window_size: u16) -> Vec<Vec<u64>> {
