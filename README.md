@@ -1,21 +1,30 @@
 # GameOfLife
 
-## Setting up the environment
-------------
+## Running
 
-1. Install `poetry`: https://python-poetry.org/docs/#installation
-2. Create an environment with `poetry install`
-3. Run `poetry shell`
-4. Run `maturin develop` to attach the rust binaries as a Python module to the venv
-5. To add a new package run `poetry add <package>`. Don't forget to commit the lockfile.
-6. To run unit tests for your service use `poetry run pytest` or simply `pytest` within `poetry shell`.
+To build and run our program, you need to have installed [poetry](https://python-poetry.org/docs/#installation).
 
-## Commands
-### Run test
-> poetry run pytest
-### Run black
-> poetry run black ltl_game/
-### Run flake8
-> poetry run flake8
-### Build rust library
-> maturin build
+If you have it installed, then you following commands available for you:
+
+- to install dependencies:
+    > make install
+
+- to build rust library:
+    > make build
+
+- to run the program:
+    > make run
+
+- to run tests:
+    > make test
+
+- to generate and open documentation (rust only):
+    > make docs
+
+- to lint source code (python only):
+    > make lint
+
+- to format source code:
+    > make format
+
+Our program is set up to use Python 3.10.2 and Rust 1.57.0

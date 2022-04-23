@@ -1,4 +1,4 @@
-from ltl_game import __version__
+from rust import __version__
 
 
 def test_version():
