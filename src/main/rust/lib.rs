@@ -1,9 +1,10 @@
+use itertools::iproduct;
 use pyo3::prelude::*;
 use rand::{distributions::Uniform, Rng};
+use serde::Deserialize;
+use std::cmp::min;
 use std::fs;
 use std::ops::Range;
-use serde::Deserialize;
-use itertools::iproduct;
 use tuple_transpose::TupleTranspose;
 
 #[pyclass]
@@ -20,7 +21,7 @@ struct Rules {
     range: usize,
     survival: (u16, u16),
     birth: (u16, u16),
-    neighbourhood: Neighbourhood
+    neighbourhood: Neighbourhood,
 }
 
 #[pyclass]
@@ -28,7 +29,7 @@ struct Rules {
 struct Engine {
     rules: Rules,
     board: Vec<Vec<u8>>,
-    window_size: usize
+    window_size: usize,
 }
 
 trait RangeParser {
@@ -49,8 +50,20 @@ impl RangeParser for &str {
 #[pymethods]
 impl Rules {
     #[new]
-    fn new(cell: u8, range: usize, survival: (u16, u16), birth: (u16, u16), neighbourhood: Neighbourhood) -> Self {
-        Rules { cell, range, survival, birth, neighbourhood }
+    fn new(
+        cell: u8,
+        range: usize,
+        survival: (u16, u16),
+        birth: (u16, u16),
+        neighbourhood: Neighbourhood,
+    ) -> Self {
+        Rules {
+            cell,
+            range,
+            survival,
+            birth,
+            neighbourhood,
+        }
     }
 
     #[staticmethod]
@@ -60,7 +73,7 @@ impl Rules {
             range: 1,
             survival: (2, 3),
             birth: (3, 3),
-            neighbourhood: Neighbourhood::Moore
+            neighbourhood: Neighbourhood::Moore,
         };
 
         if !path.is_empty() && fs::metadata(path).is_ok() {
@@ -74,12 +87,16 @@ impl Rules {
                 .map(|element| element.split_once(':').unwrap())
                 .collect();
             let get_rule = |rule_acronym: &str| -> &str { values.get(rule_acronym).unwrap() };
-            return Rules { 
+            return Rules {
                 cell: get_rule("C").parse::<u8>().unwrap_or(default_rules.cell),
-                range: get_rule("R").parse::<usize>().unwrap_or(default_rules.range),
-                survival: get_rule("S").parse_range().unwrap_or(default_rules.survival),
+                range: get_rule("R")
+                    .parse::<usize>()
+                    .unwrap_or(default_rules.range),
+                survival: get_rule("S")
+                    .parse_range()
+                    .unwrap_or(default_rules.survival),
                 birth: get_rule("B").parse_range().unwrap_or(default_rules.birth),
-                neighbourhood: default_rules.neighbourhood // TODO
+                neighbourhood: default_rules.neighbourhood, // TODO
             };
         }
         return default_rules;
@@ -89,18 +106,31 @@ impl Rules {
 impl Engine {
     fn count_alive_neighbours(&self, point: (usize, usize)) -> Result<u16, String> {
         if point.0 >= self.window_size || point.1 >= self.window_size {
-            return Err(format!("Tried to count the neighbours of point ({}, {}), while the board size is {}", point.0, point.1, self.window_size));
+            return Err(format!(
+                "Tried to count the neighbours of point ({}, {}), while the board size is {}",
+                point.0, point.1, self.window_size
+            ));
         }
 
-        let lower_bound = | p| -> usize {if p > self.rules.range { p - self.rules.range } else { 0 }};
-        let upper_bound = | p| -> usize {if self.window_size - p > self.rules.range { p + self.rules.range } else { self.window_size }};
-
+        let lower_bound = |p| -> usize {
+            if p > self.rules.range {
+                p - self.rules.range
+            } else {
+                0
+            }
+        };
+        let upper_bound = |p| -> usize { min(self.window_size, p + self.rules.range) };
         match self.rules.neighbourhood {
             Neighbourhood::Moore => {
                 let x_range: Range<usize> = lower_bound(point.0)..upper_bound(point.0);
                 let y_range: Range<usize> = lower_bound(point.1)..upper_bound(point.1);
-                return Ok(iproduct!(x_range, y_range)
-                    .fold(0, |amount, (x, y)| if self.board[x][y] == 0 {amount + 1} else {amount}));
+                return Ok(iproduct!(x_range, y_range).fold(0, |amount, (x, y)| {
+                    if self.board[x][y] == 0 {
+                        amount + 1
+                    } else {
+                        amount
+                    }
+                }));
             }
             Neighbourhood::VonNeumann => {
                 return Ok(0); // TODO von Neumann
@@ -117,8 +147,10 @@ impl Engine {
         let range = Uniform::new(0, 2);
         Engine {
             rules,
-            board: (0..window_size).map(|_| (0..window_size).map(|_| rng.sample(&range)).collect()).collect(),
-            window_size
+            board: (0..window_size)
+                .map(|_| (0..window_size).map(|_| rng.sample(&range)).collect())
+                .collect(),
+            window_size,
         }
     }
 
@@ -134,7 +166,7 @@ impl Engine {
                 count[x][y] = self.count_alive_neighbours((x, y)).unwrap();
             }
         }
-        
+
         for (x, columns) in self.board.iter_mut().enumerate() {
             for (y, value) in columns.iter_mut().enumerate() {
                 if *value != 0 {
