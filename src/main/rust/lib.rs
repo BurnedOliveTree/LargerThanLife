@@ -15,6 +15,16 @@ enum Neighbourhood {
     VonNeumann,
 }
 
+impl Neighbourhood {
+    fn from_str(string: &str) -> Result<Self, std::string::String> {
+        match string {
+            "M" => Ok(Self::Moore),
+            "N" => Ok(Self::VonNeumann),
+            _ => Err(format!("Tried to parse {} as a neighbourhood type.", string))
+        }
+    }
+}
+
 #[pyclass]
 #[derive(Deserialize, Debug, Clone)]
 struct Rules {
@@ -82,7 +92,7 @@ impl Rules {
             let rules: Rules = serde_json::from_str(&json_rules).unwrap_or(default_rules);
             return rules;
         } else if !user_input.is_empty() {
-            // "C:10;R:8;S:5;B:1;N:'M'"
+            // "C:2;R:1;S:2-3;B:3;N:M"
             let values: std::collections::HashMap<&str, &str> = user_input
                 .split(';')
                 .map(|element| element.split_once(':').unwrap())
@@ -101,7 +111,8 @@ impl Rules {
                 birth: get_rule("B")
                     .parse_range()
                     .unwrap_or(default_rules.birth),
-                neighbourhood: default_rules.neighbourhood, // TODO
+                neighbourhood: Neighbourhood::from_str(get_rule("N"))
+                    .unwrap_or(default_rules.neighbourhood),
             };
         }
         return default_rules;
@@ -148,7 +159,6 @@ impl Engine {
             }
             Neighbourhood::VonNeumann => {
                 return Ok(iproduct!(x_range, y_range).fold(0, |amount, (x, y): (usize, usize)| {
-                    // abs
                     if !(x == point.0 && y == point.1) && self.board[x][y] == self.rules.cell - 1
                         && Engine::abs_diff(x, point.0) + Engine::abs_diff(y, point.1)
                             <= self.rules.range
