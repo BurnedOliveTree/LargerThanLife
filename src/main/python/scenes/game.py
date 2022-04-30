@@ -10,7 +10,7 @@ class Game(Window):
         self.engine = None
 
     def set_rules(self, rules: Rules):
-        self.engine = Engine(rules, self.window_size//25) # TODO 
+        self.engine = Engine(rules, self.window_size, None) # TODO 
 
     def get_surface_from_bitmap(self, bitmap):
         scaled_color_bitmap = 255 * bitmap
@@ -26,11 +26,11 @@ class Game(Window):
                 if event.type == pygame.QUIT:
                     return None
 
-            self.engine.update()
             pre_bitmap = self.engine.board()
             bitmap = np.array([np.array(xi) for xi in pre_bitmap])
             background = self.get_surface_from_bitmap(bitmap)
             screen.blit(background, (0, 0))
 
             pygame.display.update()
+            self.engine.update()
             clock.tick(self.FPS)

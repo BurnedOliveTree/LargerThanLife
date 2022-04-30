@@ -3,6 +3,7 @@ use pyo3::prelude::*;
 use rand::{distributions::Uniform, Rng};
 use serde::Deserialize;
 use std::cmp::min;
+use std::error::Error;
 use std::fs;
 use std::ops::Range;
 use tuple_transpose::TupleTranspose;
@@ -29,7 +30,7 @@ struct Rules {
 struct Engine {
     rules: Rules,
     board: Vec<Vec<u8>>,
-    window_size: usize,
+    board_size: usize,
 }
 
 trait RangeParser {
@@ -88,14 +89,18 @@ impl Rules {
                 .collect();
             let get_rule = |rule_acronym: &str| -> &str { values.get(rule_acronym).unwrap() };
             return Rules {
-                cell: get_rule("C").parse::<u8>().unwrap_or(default_rules.cell),
+                cell: get_rule("C")
+                    .parse::<u8>()
+                    .unwrap_or(default_rules.cell),
                 range: get_rule("R")
                     .parse::<usize>()
                     .unwrap_or(default_rules.range),
                 survival: get_rule("S")
                     .parse_range()
                     .unwrap_or(default_rules.survival),
-                birth: get_rule("B").parse_range().unwrap_or(default_rules.birth),
+                birth: get_rule("B")
+                    .parse_range()
+                    .unwrap_or(default_rules.birth),
                 neighbourhood: default_rules.neighbourhood, // TODO
             };
         }
@@ -114,10 +119,10 @@ impl Engine {
     }
 
     fn count_alive_neighbours(&self, point: (usize, usize)) -> Result<u16, String> {
-        if point.0 >= self.window_size || point.1 >= self.window_size {
+        if point.0 >= self.board_size || point.1 >= self.board_size {
             return Err(format!(
                 "Tried to count the neighbours of point ({}, {}), while the board size is {}",
-                point.0, point.1, self.window_size
+                point.0, point.1, self.board_size
             ));
         }
 
@@ -128,7 +133,7 @@ impl Engine {
                 0
             }
         };
-        let upper_bound = |p| -> usize { min(self.window_size, p + self.rules.range) };
+        let upper_bound = |p| -> usize { min(self.board_size, p + self.rules.range) };
         let x_range: Range<usize> = lower_bound(point.0)..upper_bound(point.0);
         let y_range: Range<usize> = lower_bound(point.1)..upper_bound(point.1);
         match self.rules.neighbourhood {
@@ -142,7 +147,7 @@ impl Engine {
                 }));
             }
             Neighbourhood::VonNeumann => {
-                iproduct!(x_range, y_range).fold(0, |amount, (x, y): (usize, usize)| {
+                return Ok(iproduct!(x_range, y_range).fold(0, |amount, (x, y): (usize, usize)| {
                     // abs
                     if self.board[x][y] == 0
                         && Engine::abs_diff(x, point.0) + Engine::abs_diff(y, point.1)
@@ -152,27 +157,47 @@ impl Engine {
                     } else {
                         amount
                     }
-                });
-
-                return Ok(0); // TODO von Neumann
+                }));
             }
         }
+    }
+
+    fn parse(path: String) -> Result<(Vec<Vec<u8>>, usize), Box<dyn Error>> {
+        let mut reader = csv::Reader::from_path(path)?;
+        let data: Vec<Vec<u8>> = reader
+            .records()
+            .map(|record: Result<csv::StringRecord, csv::Error>| -> Vec<u8> {
+                record
+                    .unwrap()
+                    .into_iter()
+                    .map(|field| field.parse::<u8>().unwrap())
+                    .collect()
+            }).collect();
+        let len = data.len();
+        return Ok((data, len));
     }
 }
 
 #[pymethods]
 impl Engine {
     #[new]
-    fn new(rules: Rules, window_size: usize) -> Self {
-        let mut rng = rand::thread_rng();
-        let range = Uniform::new(0, 2);
-        Engine {
-            rules,
-            board: (0..window_size)
-                .map(|_| (0..window_size).map(|_| rng.sample(&range)).collect())
-                .collect(),
-            window_size,
-        }
+    fn new(rules: Rules, size: usize, board_path: Option<String>) -> Self {
+        let mut board_size = size;
+        let board: Vec<Vec<u8>>;
+        match board_path {
+            Some(path) => {
+                (board, board_size) = Engine::parse(path).unwrap();
+            },
+            None => {
+                let mut rng = rand::thread_rng();
+                let range = Uniform::new(0, 2);
+                board = (0..board_size)
+                    .map(|_| (0..board_size).map(|_| rng.sample(&range)).collect())
+                    .collect();
+            }
+        };
+
+        Engine { rules, board, board_size }
     }
 
     pub fn board(&self) -> Vec<Vec<u8>> {
@@ -180,10 +205,10 @@ impl Engine {
     }
 
     pub fn update(&mut self) {
-        let mut count = vec![vec![0; self.window_size]; self.window_size];
+        let mut count = vec![vec![0; self.board_size]; self.board_size];
 
-        for x in 0..self.window_size {
-            for y in 0..self.window_size {
+        for x in 0..self.board_size {
+            for y in 0..self.board_size {
                 count[x][y] = self.count_alive_neighbours((x, y)).unwrap();
             }
         }

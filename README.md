@@ -27,4 +27,4 @@ If you have it installed, then you following commands available for you:
 - to format source code:
     > make format
 
-Our program is set up to use Python 3.10.2 and Rust 1.57.0
+Our program is set up to use Python 3.10.2 and Rust 1.60.0
