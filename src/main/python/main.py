@@ -20,7 +20,7 @@ if __name__ == "__main__":
         if scene == Scene.MENU:
             scene = menu.render(screen, clock)
         elif scene == Scene.GAME:
-            game.set_rules(Rules.parse(menu.rules_text_box.text, menu.path_text_box.text))
+            game.set_rules(Rules.parse(menu.rules_text_box.text, menu.path_text_box.text), menu.board_text_box.text)
             scene = game.render(screen, clock)
         elif scene is None:
             sys.exit()

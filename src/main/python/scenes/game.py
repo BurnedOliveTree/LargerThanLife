@@ -9,8 +9,9 @@ class Game(Window):
         super().__init__(window_size, FPS)
         self.engine = None
 
-    def set_rules(self, rules: Rules):
-        self.engine = Engine(rules, self.window_size, None) # TODO 
+    def set_rules(self, rules: Rules, path: str):
+        path = None if path == "" else path
+        self.engine = Engine(rules, self.window_size, path)
 
     def get_surface_from_bitmap(self, bitmap):
         scaled_color_bitmap = 255 * bitmap

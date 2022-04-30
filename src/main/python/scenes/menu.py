@@ -9,19 +9,28 @@ class Menu(Window):
         self.rules_text_box = InputTextBox(
             width=200,
             height=None,
-            coordinates=(self.window_size // 2, self.window_size // 2),
-            active_color=pygame.Color("lightblue"),
-            passive_color=pygame.Color("blue"),
-            description="Enter rules: ",
+            coordinates=(self.window_size // 2, self.window_size * 5 // 12),
+            active_color=pygame.Color("#FA58B6"),
+            passive_color=pygame.Color("#7A0BC0"),
+            description="Enter rules  ",
         )
 
         self.path_text_box = InputTextBox(
             width=200,
             height=None,
-            coordinates=(self.window_size // 2, self.window_size // 2 + self.rules_text_box.height*2),
-            active_color=pygame.Color("lightblue"),
-            passive_color=pygame.Color("blue"),
-            description="Enter file path: ",
+            coordinates=(self.window_size // 2, self.window_size * 6 // 12),
+            active_color=pygame.Color("#FA58B6"),
+            passive_color=pygame.Color("#7A0BC0"),
+            description="Enter rules file path (JSON)  ",
+        )
+
+        self.board_text_box = InputTextBox(
+            width=200,
+            height=None,
+            coordinates=(self.window_size // 2, self.window_size * 7 // 12),
+            active_color=pygame.Color("#FA58B6"),
+            passive_color=pygame.Color("#7A0BC0"),
+            description="Enter board file path (CSV)  ",
         )
 
         self.start_game_button = Button(
@@ -32,16 +41,16 @@ class Menu(Window):
                 (self.window_size // 2) - 50,
                 (self.window_size * 3 // 4) - 25,
             ),
-            active_color=pygame.Color("lightblue"),
-            passive_color=pygame.Color("blue"),
+            active_color=pygame.Color("#FA58B6"),
+            passive_color=pygame.Color("#7A0BC0"),
             invoke_scene_name=Scene.GAME,
         )
 
     def draw_title(self, screen):
-        font = pygame.font.Font(None, 30)
-        text = font.render("Larger than life", True, pygame.Color("white"))
+        font = pygame.font.Font(None, 48)
+        text = font.render("Larger than Life", True, pygame.Color("#FA58B6"))
         text_rect = text.get_rect()
-        text_rect.center = (self.window_size // 2, self.window_size // 3)
+        text_rect.center = (self.window_size // 2, self.window_size * 2 // 12)
         screen.blit(text, text_rect)
 
     def render(self, screen, clock):
@@ -52,6 +61,7 @@ class Menu(Window):
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     self.rules_text_box.set_status(event.pos)
                     self.path_text_box.set_status(event.pos)
+                    self.board_text_box.set_status(event.pos)
                     game_screen = self.start_game_button.set_status(event.pos)
                     if game_screen is not None:
                         return game_screen
@@ -60,11 +70,14 @@ class Menu(Window):
                         self.rules_text_box.get_text_after_event(event)
                     elif self.path_text_box.is_active is True:
                         self.path_text_box.get_text_after_event(event)
+                    elif self.board_text_box.is_active is True:
+                        self.board_text_box.get_text_after_event(event)
 
-            screen.fill((0, 0, 0))
+            screen.fill((26, 26, 64))
             self.draw_title(screen)
             self.rules_text_box.draw(screen)
             self.path_text_box.draw(screen)
+            self.board_text_box.draw(screen)
             self.start_game_button.draw(screen)
 
             pygame.display.flip()
