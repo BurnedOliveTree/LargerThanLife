@@ -91,18 +91,16 @@ impl Engine {
         if point.0 >= self.window_size || point.1 >= self.window_size {
             return Err(format!("Tried to count the neighbours of point ({}, {}), while the board size is {}", point.0, point.1, self.window_size));
         }
+
+        let lower_bound = | p| -> usize {if p > self.rules.range { p - self.rules.range } else { 0 }};
+        let upper_bound = | p| -> usize {if self.window_size - p > self.rules.range { p + self.rules.range } else { self.window_size }};
+
         match self.rules.neighbourhood {
             Neighbourhood::Moore => {
-                let lower_x_bound = if point.0 > self.rules.range { point.0 - self.rules.range } else { 0 };
-                let upper_x_bound = if point.0 + self.rules.range < 600 { point.0 + self.rules.range } else { 600 };
-                let lower_y_bound = if point.1 > self.rules.range { point.1 - self.rules.range } else { 0 };
-                let upper_y_bound = if point.1 + self.rules.range < 600 { point.1 + self.rules.range } else { 600 };
-                let x_range: Range<usize> = lower_x_bound..upper_x_bound;
-                let y_range: Range<usize> = lower_y_bound..upper_y_bound;
+                let x_range: Range<usize> = lower_bound(point.0)..upper_bound(point.0);
+                let y_range: Range<usize> = lower_bound(point.1)..upper_bound(point.1);
                 return Ok(iproduct!(x_range, y_range)
-                    .map(|(x, y)| self.board[x][y])
-                    .map(|cell| if cell == 0 { 1 } else { 0 })
-                    .sum());
+                    .fold(0, |amount, (x, y)| if self.board[x][y] == 0 {amount + 1} else {amount}));
             }
             Neighbourhood::VonNeumann => {
                 return Ok(0); // TODO von Neumann
