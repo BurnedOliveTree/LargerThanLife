@@ -133,13 +133,13 @@ impl Engine {
                 0
             }
         };
-        let upper_bound = |p| -> usize { min(self.board_size, p + self.rules.range) };
+        let upper_bound = |p| -> usize { min(self.board_size - 1, p + self.rules.range) + 1 };
         let x_range: Range<usize> = lower_bound(point.0)..upper_bound(point.0);
         let y_range: Range<usize> = lower_bound(point.1)..upper_bound(point.1);
         match self.rules.neighbourhood {
             Neighbourhood::Moore => {
                 return Ok(iproduct!(x_range, y_range).fold(0, |amount, (x, y)| {
-                    if self.board[x][y] == 0 {
+                    if !(x == point.0 && y == point.1) && self.board[x][y] == self.rules.cell - 1 {
                         amount + 1
                     } else {
                         amount
@@ -149,7 +149,7 @@ impl Engine {
             Neighbourhood::VonNeumann => {
                 return Ok(iproduct!(x_range, y_range).fold(0, |amount, (x, y): (usize, usize)| {
                     // abs
-                    if self.board[x][y] == 0
+                    if !(x == point.0 && y == point.1) && self.board[x][y] == self.rules.cell - 1
                         && Engine::abs_diff(x, point.0) + Engine::abs_diff(y, point.1)
                             <= self.rules.range
                     {
@@ -220,7 +220,7 @@ impl Engine {
                         *value -= 1;
                     }
                 } else if *value != self.rules.cell - 1 {
-                    if count[x][y] > self.rules.birth.0 || count[x][y] < self.rules.birth.1 {
+                    if count[x][y] >= self.rules.birth.0 && count[x][y] <= self.rules.birth.1 {
                         *value = self.rules.cell - 1;
                     }
                 }
