@@ -143,9 +143,9 @@ impl Engine {
                     if count[x][y] < self.rules.survival.0 || count[x][y] > self.rules.survival.1 {
                         *value -= 1;
                     }
-                } else if *value != self.rules.cell {
+                } else if *value != self.rules.cell - 1 {
                     if count[x][y] > self.rules.birth.0 || count[x][y] < self.rules.birth.1 {
-                        *value = 0;
+                        *value = self.rules.cell - 1;
                     }
                 }
             }
