@@ -104,6 +104,15 @@ impl Rules {
 }
 
 impl Engine {
+    // see issue #89492 error[E0658]: use of unstable library feature 'int_abs_diff'
+    fn abs_diff(slf: usize, other: usize) -> usize {
+        if slf < other {
+            other - slf
+        } else {
+            slf - other
+        }
+    }
+
     fn count_alive_neighbours(&self, point: (usize, usize)) -> Result<u16, String> {
         if point.0 >= self.window_size || point.1 >= self.window_size {
             return Err(format!(
@@ -120,10 +129,10 @@ impl Engine {
             }
         };
         let upper_bound = |p| -> usize { min(self.window_size, p + self.rules.range) };
+        let x_range: Range<usize> = lower_bound(point.0)..upper_bound(point.0);
+        let y_range: Range<usize> = lower_bound(point.1)..upper_bound(point.1);
         match self.rules.neighbourhood {
             Neighbourhood::Moore => {
-                let x_range: Range<usize> = lower_bound(point.0)..upper_bound(point.0);
-                let y_range: Range<usize> = lower_bound(point.1)..upper_bound(point.1);
                 return Ok(iproduct!(x_range, y_range).fold(0, |amount, (x, y)| {
                     if self.board[x][y] == 0 {
                         amount + 1
@@ -133,6 +142,18 @@ impl Engine {
                 }));
             }
             Neighbourhood::VonNeumann => {
+                iproduct!(x_range, y_range).fold(0, |amount, (x, y): (usize, usize)| {
+                    // abs
+                    if self.board[x][y] == 0
+                        && Engine::abs_diff(x, point.0) + Engine::abs_diff(y, point.1)
+                            <= self.rules.range
+                    {
+                        amount + 1
+                    } else {
+                        amount
+                    }
+                });
+
                 return Ok(0); // TODO von Neumann
             }
         }
