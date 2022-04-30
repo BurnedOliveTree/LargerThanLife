@@ -87,9 +87,9 @@ impl Rules {
 }
 
 impl Engine {
-    fn count_alive_neighbours(&self, point: (usize, usize)) -> u16 {
+    fn count_alive_neighbours(&self, point: (usize, usize)) -> Result<u16, String> {
         if point.0 >= self.window_size || point.1 >= self.window_size {
-            // TODO handle
+            return Err(format!("Tried to count the neighbours of point ({}, {}), while the board size is {}", point.0, point.1, self.window_size));
         }
         match self.rules.neighbourhood {
             Neighbourhood::Moore => {
@@ -99,13 +99,13 @@ impl Engine {
                 let upper_y_bound = if point.1 + self.rules.range < 600 { point.1 + self.rules.range } else { 600 };
                 let x_range: Range<usize> = lower_x_bound..upper_x_bound;
                 let y_range: Range<usize> = lower_y_bound..upper_y_bound;
-                return iproduct!(x_range, y_range)
+                return Ok(iproduct!(x_range, y_range)
                     .map(|(x, y)| self.board[x][y])
                     .map(|cell| if cell == 0 { 1 } else { 0 })
-                    .sum();
+                    .sum());
             }
             Neighbourhood::VonNeumann => {
-                return 0 // TODO von Neumann
+                return Ok(0); // TODO von Neumann
             }
         }
     }
@@ -133,7 +133,7 @@ impl Engine {
 
         for x in 0..self.window_size {
             for y in 0..self.window_size {
-                count[x][y] = self.count_alive_neighbours((x, y));
+                count[x][y] = self.count_alive_neighbours((x, y)).unwrap();
             }
         }
         
