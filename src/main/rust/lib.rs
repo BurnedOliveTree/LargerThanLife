@@ -1,7 +1,9 @@
 use pyo3::prelude::*;
 use rand::{distributions::Uniform, Rng};
 use std::fs;
+use std::ops::Range;
 use serde::Deserialize;
+use itertools::iproduct;
 use tuple_transpose::TupleTranspose;
 
 #[pyclass]
@@ -15,9 +17,9 @@ enum Neighbourhood {
 #[derive(Deserialize, Debug, Clone)]
 struct Rules {
     cell: u8,
-    range: u8,
-    survival: (u64, u64),
-    birth: (u64, u64),
+    range: usize,
+    survival: (u16, u16),
+    birth: (u16, u16),
     neighbourhood: Neighbourhood
 }
 
@@ -25,20 +27,21 @@ struct Rules {
 #[derive(Debug, Clone)]
 struct Engine {
     rules: Rules,
-    board: Vec<Vec<u8>>
+    board: Vec<Vec<u8>>,
+    window_size: usize
 }
 
 trait RangeParser {
-    fn parse_range(&self) -> Result<(u64, u64), std::num::ParseIntError>;
+    fn parse_range(&self) -> Result<(u16, u16), std::num::ParseIntError>;
 }
 
 impl RangeParser for &str {
-    fn parse_range(&self) -> Result<(u64, u64), std::num::ParseIntError> {
+    fn parse_range(&self) -> Result<(u16, u16), std::num::ParseIntError> {
         if self.contains('-') {
             let (value1, value2) = self.split_once('-').unwrap();
-            return (value1.parse::<u64>(), value2.parse::<u64>()).transpose();
+            return (value1.parse::<u16>(), value2.parse::<u16>()).transpose();
         } else {
-            return (self.parse::<u64>(), self.parse::<u64>()).transpose();
+            return (self.parse::<u16>(), self.parse::<u16>()).transpose();
         }
     }
 }
@@ -46,7 +49,7 @@ impl RangeParser for &str {
 #[pymethods]
 impl Rules {
     #[new]
-    fn new(cell: u8, range: u8, survival: (u64, u64), birth: (u64, u64), neighbourhood: Neighbourhood) -> Self {
+    fn new(cell: u8, range: usize, survival: (u16, u16), birth: (u16, u16), neighbourhood: Neighbourhood) -> Self {
         Rules { cell, range, survival, birth, neighbourhood }
     }
 
@@ -73,27 +76,80 @@ impl Rules {
             let get_rule = |rule_acronym: &str| -> &str { values.get(rule_acronym).unwrap() };
             return Rules { 
                 cell: get_rule("C").parse::<u8>().unwrap_or(default_rules.cell),
-                range: get_rule("R").parse::<u8>().unwrap_or(default_rules.range),
+                range: get_rule("R").parse::<usize>().unwrap_or(default_rules.range),
                 survival: get_rule("S").parse_range().unwrap_or(default_rules.survival),
                 birth: get_rule("B").parse_range().unwrap_or(default_rules.birth),
-                neighbourhood: default_rules.neighbourhood
+                neighbourhood: default_rules.neighbourhood // TODO
             };
         }
         return default_rules;
     }
 }
 
+impl Engine {
+    fn count_alive_neighbours(&self, point: (usize, usize)) -> u16 {
+        if point.0 >= self.window_size || point.1 >= self.window_size {
+            // TODO handle
+        }
+        match self.rules.neighbourhood {
+            Neighbourhood::Moore => {
+                let lower_x_bound = if point.0 > self.rules.range { point.0 - self.rules.range } else { 0 };
+                let upper_x_bound = if point.0 + self.rules.range < 600 { point.0 + self.rules.range } else { 600 };
+                let lower_y_bound = if point.1 > self.rules.range { point.1 - self.rules.range } else { 0 };
+                let upper_y_bound = if point.1 + self.rules.range < 600 { point.1 + self.rules.range } else { 600 };
+                let x_range: Range<usize> = lower_x_bound..upper_x_bound;
+                let y_range: Range<usize> = lower_y_bound..upper_y_bound;
+                return iproduct!(x_range, y_range)
+                    .map(|(x, y)| self.board[x][y])
+                    .map(|cell| if cell == 0 { 1 } else { 0 })
+                    .sum();
+            }
+            Neighbourhood::VonNeumann => {
+                return 0 // TODO von Neumann
+            }
+        }
+    }
+}
+
 #[pymethods]
 impl Engine {
     #[new]
-    fn new(rules: Rules) -> Self {
-        Engine { rules, board: vec![vec![0; 600]; 600] }
-    }
-
-    fn generate_image(&self, window_size: u16) -> Vec<Vec<u64>> {
+    fn new(rules: Rules, window_size: usize) -> Self {
         let mut rng = rand::thread_rng();
         let range = Uniform::new(0, 2);
-        return (0..window_size).map(|_| (0..window_size).map(|_| rng.sample(&range)).collect()).collect();
+        Engine {
+            rules,
+            board: (0..window_size).map(|_| (0..window_size).map(|_| rng.sample(&range)).collect()).collect(),
+            window_size
+        }
+    }
+
+    pub fn board(&self) -> Vec<Vec<u8>> {
+        self.board.to_vec()
+    }
+
+    pub fn update(&mut self) {
+        let mut count = vec![vec![0; self.window_size]; self.window_size];
+
+        for x in 0..self.window_size {
+            for y in 0..self.window_size {
+                count[x][y] = self.count_alive_neighbours((x, y));
+            }
+        }
+        
+        for (x, columns) in self.board.iter_mut().enumerate() {
+            for (y, value) in columns.iter_mut().enumerate() {
+                if *value != 0 {
+                    if count[x][y] < self.rules.survival.0 || count[x][y] > self.rules.survival.1 {
+                        *value -= 1;
+                    }
+                } else if *value != self.rules.cell {
+                    if count[x][y] > self.rules.birth.0 || count[x][y] < self.rules.birth.1 {
+                        *value = 0;
+                    }
+                }
+            }
+        }
     }
 }
 
