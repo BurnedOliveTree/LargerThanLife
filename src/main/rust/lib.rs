@@ -1,4 +1,4 @@
-use itertools::iproduct;
+use itertools::{iproduct, izip};
 use pyo3::prelude::*;
 use rand::{distributions::Uniform, Rng};
 use serde::Deserialize;
@@ -204,21 +204,21 @@ impl Engine {
     pub fn update(&mut self) {
         let mut count = vec![vec![0; self.board_size]; self.board_size];
 
-        for x in 0..self.board_size {
-            for y in 0..self.board_size {
-                count[x][y] = self.count_alive_neighbours((x, y)).unwrap();
+        for (x, column) in count.iter_mut().enumerate() {
+            for (y, value) in column.iter_mut().enumerate() {
+                *value = self.count_alive_neighbours((x, y)).unwrap();
             }
         }
 
-        for (x, columns) in self.board.iter_mut().enumerate() {
-            for (y, value) in columns.iter_mut().enumerate() {
-                if *value != 0 {
-                    if count[x][y] < self.rules.survival.0 || count[x][y] > self.rules.survival.1 {
-                        *value -= 1;
+        for (board_column, count_column) in izip!(self.board.iter_mut(), count.iter()) {
+            for (board_value, count_value) in izip!(board_column.iter_mut(), count_column.iter()) {
+                if *board_value != 0 {
+                    if *count_value < self.rules.survival.0 || *count_value > self.rules.survival.1 {
+                        *board_value -= 1;
                     }
-                } else if *value != self.rules.cell - 1 {
-                    if count[x][y] >= self.rules.birth.0 && count[x][y] <= self.rules.birth.1 {
-                        *value = self.rules.cell - 1;
+                } else if *board_value != self.rules.cell - 1 {
+                    if *count_value >= self.rules.birth.0 && *count_value <= self.rules.birth.1 {
+                        *board_value = self.rules.cell - 1;
                     }
                 }
             }
