@@ -8,6 +8,8 @@ use std::fs;
 use std::ops::Range;
 use tuple_transpose::TupleTranspose;
 
+// Neighbourhood ---------------------------------------------------------------------------------
+
 #[pyclass]
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 enum Neighbourhood {
@@ -25,6 +27,8 @@ impl Neighbourhood {
     }
 }
 
+// Rules -----------------------------------------------------------------------------------------
+
 #[pyclass]
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 struct Rules {
@@ -35,20 +39,12 @@ struct Rules {
     neighbourhood: Neighbourhood,
 }
 
-#[pyclass]
-#[derive(Debug, Clone)]
-struct Engine {
-    rules: Rules,
-    board: Vec<Vec<u8>>,
-    board_size: usize,
-}
-
 trait RangeParser {
-    fn parse_range(&self) -> Result<(u16, u16), std::num::ParseIntError>;
+    fn from_str(&self) -> Result<(u16, u16), std::num::ParseIntError>;
 }
 
 impl RangeParser for &str {
-    fn parse_range(&self) -> Result<(u16, u16), std::num::ParseIntError> {
+    fn from_str(&self) -> Result<(u16, u16), std::num::ParseIntError> {
         if self.contains('-') {
             let (value1, value2) = self.split_once('-').unwrap();
             return (value1.parse::<u16>(), value2.parse::<u16>()).transpose();
@@ -57,7 +53,6 @@ impl RangeParser for &str {
         }
     }
 }
-
 
 impl Default for Rules {
     fn default() -> Rules {
@@ -92,15 +87,10 @@ impl Rules {
     }
 
     #[staticmethod]
-    fn parse(user_input: &str, path: &str) -> Self {
+    fn parse_str(rules: &str) -> Self {
         let default_rules = Rules{ ..Default::default() };
-
-        if !path.is_empty() && fs::metadata(path).is_ok() {
-            let json_rules = fs::read_to_string(path).unwrap();
-            let rules: Rules = serde_json::from_str(&json_rules).unwrap_or(default_rules);
-            return rules;
-        } else if !user_input.is_empty() {
-            let values: std::collections::HashMap<&str, &str> = user_input
+        if !rules.is_empty() {
+            let values: std::collections::HashMap<&str, &str> = rules
                 .split(';')
                 .map(|element| element.split_once(':').unwrap())
                 .collect();
@@ -113,10 +103,10 @@ impl Rules {
                     .parse::<usize>()
                     .unwrap_or(default_rules.range),
                 survival: get_rule("S")
-                    .parse_range()
+                    .from_str()
                     .unwrap_or(default_rules.survival),
                 birth: get_rule("B")
-                    .parse_range()
+                    .from_str()
                     .unwrap_or(default_rules.birth),
                 neighbourhood: Neighbourhood::from_str(get_rule("N"))
                     .unwrap_or(default_rules.neighbourhood),
@@ -124,6 +114,24 @@ impl Rules {
         }
         return default_rules;
     }
+
+    #[staticmethod]
+    fn parse_file(path: &str) -> Self {
+        let default_rules = Rules{ ..Default::default() };
+        let json_rules = fs::read_to_string(path).unwrap();
+        let rules: Rules = serde_json::from_str(&json_rules).unwrap_or(default_rules);
+        return rules;
+    }
+}
+
+// Engine ----------------------------------------------------------------------------------------
+
+#[pyclass]
+#[derive(Debug, Clone)]
+struct Engine {
+    rules: Rules,
+    board: Vec<Vec<u8>>,
+    board_size: usize,
 }
 
 impl Engine {
@@ -136,6 +144,20 @@ impl Engine {
         }
     }
 
+    fn do_count_alive_neighbours<F : Fn ((usize, usize), usize, usize) -> bool> (&self, point: (usize, usize), cond: F) -> u16 {
+        let lower_bound = |p| -> usize { if p > self.rules.range { p - self.rules.range } else { 0 }};
+        let upper_bound = |p| -> usize { min(self.board_size - 1, p + self.rules.range) + 1 };
+        let x_range: Range<usize> = lower_bound(point.0)..upper_bound(point.0);
+        let y_range: Range<usize> = lower_bound(point.1)..upper_bound(point.1);
+        return iproduct!(x_range, y_range).fold(0, |amount, (x, y)| {
+            if !(x == point.0 && y == point.1) && self.board[x][y] == self.rules.cell - 1 && cond(point, x, y) {
+                amount + 1
+            } else {
+                amount
+            }
+        });
+    }
+
     fn count_alive_neighbours(&self, point: (usize, usize)) -> Result<u16, String> {
         if point.0 >= self.board_size || point.1 >= self.board_size {
             return Err(format!(
@@ -144,37 +166,12 @@ impl Engine {
             ));
         }
 
-        let lower_bound = |p| -> usize {
-            if p > self.rules.range {
-                p - self.rules.range
-            } else {
-                0
-            }
-        };
-        let upper_bound = |p| -> usize { min(self.board_size - 1, p + self.rules.range) + 1 };
-        let x_range: Range<usize> = lower_bound(point.0)..upper_bound(point.0);
-        let y_range: Range<usize> = lower_bound(point.1)..upper_bound(point.1);
         match self.rules.neighbourhood {
             Neighbourhood::Moore => {
-                return Ok(iproduct!(x_range, y_range).fold(0, |amount, (x, y)| {
-                    if !(x == point.0 && y == point.1) && self.board[x][y] == self.rules.cell - 1 {
-                        amount + 1
-                    } else {
-                        amount
-                    }
-                }));
+                return Ok(self.do_count_alive_neighbours(point, |_, _, _| {true}));
             }
             Neighbourhood::VonNeumann => {
-                return Ok(iproduct!(x_range, y_range).fold(0, |amount, (x, y): (usize, usize)| {
-                    if !(x == point.0 && y == point.1) && self.board[x][y] == self.rules.cell - 1
-                        && Engine::abs_diff(x, point.0) + Engine::abs_diff(y, point.1)
-                            <= self.rules.range
-                    {
-                        amount + 1
-                    } else {
-                        amount
-                    }
-                }));
+                return Ok(self.do_count_alive_neighbours(point, |point, x, y| {Engine::abs_diff(x, point.0) + Engine::abs_diff(y, point.1) <= self.rules.range}));
             }
         }
     }
@@ -254,6 +251,10 @@ fn rust(_py: Python, m: &PyModule) -> PyResult<()> {
     Ok(())
 }
 
+
+// Tests -------------------------------------------------------------------------------------------
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -305,6 +306,13 @@ mod tests {
                 birth: (113,115),
                 neighbourhood: Neighbourhood::Moore,
             });
+    }
+
+    #[test]
+    fn test_load_strate_user_input_for_rules() {
+        let user_input = "ABC";
+        let parsed_rules = Rules::parse(user_input, "");
+        assert_eq!(parsed_rules, WAFFLE_RULES);
     }
         
 
