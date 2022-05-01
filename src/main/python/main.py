@@ -4,7 +4,9 @@ from scenes import Scene, Menu, Game
 from rust import Rules
 
 IMG_SIZE = 600
+MENU_FPS = 60
 FPS = 1
+BOARD_SIZE = 100
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -14,8 +16,8 @@ pygame.display.set_caption("Larger than Life")
 
 if __name__ == "__main__":
     scene = Scene.MENU
-    menu = Menu(IMG_SIZE, FPS)
-    game = Game(IMG_SIZE, FPS)
+    menu = Menu(IMG_SIZE, MENU_FPS)
+    game = Game(IMG_SIZE, FPS, BOARD_SIZE)
     while True:
         if scene == Scene.MENU:
             scene = menu.render(screen, clock)

@@ -5,13 +5,14 @@ from rust import Engine, Rules
 
 
 class Game(Window):
-    def __init__(self, window_size, FPS):
+    def __init__(self, window_size, FPS, board_size=None):
         super().__init__(window_size, FPS)
+        self.board_size = board_size if board_size is not None else window_size
         self.engine = None
 
     def set_rules(self, rules: Rules, path: str):
         path = None if path == "" else path
-        self.engine = Engine(rules, self.window_size, path)
+        self.engine = Engine(rules, self.board_size, path)
 
     def get_surface_from_bitmap(self, bitmap):
         scaled_color_bitmap = 255 * bitmap
