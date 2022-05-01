@@ -284,7 +284,22 @@ mod tests {
                 neighbourhood: Neighbourhood::Moore,
             });
     }
+    
+    #[test]
+    fn test_load_wrong_rules_from_user_input() {
+        let user_input = "C:\"2\";R:345;S:-5;B:113-115;N:6";
+        let parsed_rules = Rules::parse(user_input, "");
+        assert_eq!(parsed_rules, 
+            Rules{
+                cell: 2,
+                range: 1,
+                survival: (2,3),
+                birth: (113,115),
+                neighbourhood: Neighbourhood::Moore,
+            });
+    }
         
+
     #[test]
     fn test_load_rules_from_not_existing_file() {
         assert_eq!(0, 0);
