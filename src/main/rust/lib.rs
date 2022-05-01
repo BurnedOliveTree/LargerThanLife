@@ -273,11 +273,31 @@ mod tests {
     
     #[test]
     fn test_load_wrong_rules_from_file() {
+        let path = "./res/rules/wrong.json";
+        let parsed_rules = Rules::parse("", path);
+        assert_eq!(parsed_rules, 
+            Rules{
+                cell: 2,
+                range: 1,
+                survival: (2,3),
+                birth: (113,115),
+                neighbourhood: Neighbourhood::Moore,
+            });
+    }
+        
+    #[test]
+    fn test_load_rules_from_not_existing_file() {
+        assert_eq!(0, 0);
+    }
+
+
+    #[test]
+    fn test_load_board_from_file() {
         assert_eq!(0, 0);
     }
 
     #[test]
-    fn test_load_board_from_file() {
+    fn test_load_board_from_not_existing_file() {
         assert_eq!(0, 0);
     }
 
