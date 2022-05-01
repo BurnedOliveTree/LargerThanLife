@@ -9,7 +9,7 @@ use std::ops::Range;
 use tuple_transpose::TupleTranspose;
 
 #[pyclass]
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 enum Neighbourhood {
     Moore,
     VonNeumann,
@@ -26,7 +26,7 @@ impl Neighbourhood {
 }
 
 #[pyclass]
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 struct Rules {
     cell: u8,
     range: usize,
@@ -92,7 +92,6 @@ impl Rules {
             let rules: Rules = serde_json::from_str(&json_rules).unwrap_or(default_rules);
             return rules;
         } else if !user_input.is_empty() {
-            // "C:2;R:1;S:2-3;B:3;N:M"
             let values: std::collections::HashMap<&str, &str> = user_input
                 .split(';')
                 .map(|element| element.split_once(':').unwrap())
@@ -245,4 +244,46 @@ fn rust(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<Rules>()?;
     m.add_class::<Engine>()?;
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    static LIFE_RULES: Rules = Rules {
+        cell: 2,
+        range: 1,
+        survival: (2, 3),
+        birth: (3, 3),
+        neighbourhood: Neighbourhood::Moore,
+    };
+
+    #[test]
+    fn test_load_rules_from_string() {
+        let user_input = "C:2;R:1;S:2-3;B:3;N:M";
+        let parsed_rules = Rules::parse(user_input, "");
+        assert_eq!(parsed_rules, LIFE_RULES);
+    }
+
+    #[test]
+    fn test_load_rules_from_file() {
+        let path = "./res/rules/life.json";
+        let parsed_rules = Rules::parse("", path);
+        assert_eq!(parsed_rules, LIFE_RULES);
+    }
+    
+    #[test]
+    fn test_load_wrong_rules_from_file() {
+        assert_eq!(0, 0);
+    }
+
+    #[test]
+    fn test_load_board_from_file() {
+        assert_eq!(0, 0);
+    }
+
+    #[test]
+    fn test_update_board() {
+        assert_eq!(0, 0);
+    }
+
 }
