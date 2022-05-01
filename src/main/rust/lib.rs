@@ -8,25 +8,8 @@ use std::fs;
 use std::ops::Range;
 use tuple_transpose::TupleTranspose;
 
-// Neighbourhood ---------------------------------------------------------------------------------
-
-#[pyclass]
-#[derive(Deserialize, Debug, Clone, PartialEq)]
-enum Neighbourhood {
-    Moore,
-    VonNeumann,
-}
-
-impl Neighbourhood {
-    fn from_str(string: &str) -> Result<Self, std::string::String> {
-        match string {
-            "M" => Ok(Self::Moore),
-            "N" => Ok(Self::VonNeumann),
-            _ => Err(format!("Tried to parse {} as a neighbourhood type.", string))
-        }
-    }
-}
-
+mod neighbourhood;
+use neighbourhood::Neighbourhood;
 // Rules -----------------------------------------------------------------------------------------
 
 #[pyclass]
