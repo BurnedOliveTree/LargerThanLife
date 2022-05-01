@@ -58,6 +58,20 @@ impl RangeParser for &str {
     }
 }
 
+
+impl Default for Rules {
+    fn default() -> Rules {
+        Rules {
+            cell: 2,
+            range: 1,
+            survival: (2, 3),
+            birth: (3, 3),
+            neighbourhood: Neighbourhood::Moore,
+        }
+    }
+}
+
+
 #[pymethods]
 impl Rules {
     #[new]
@@ -79,13 +93,7 @@ impl Rules {
 
     #[staticmethod]
     fn parse(user_input: &str, path: &str) -> Self {
-        let default_rules = Rules {
-            cell: 2,
-            range: 1,
-            survival: (2, 3),
-            birth: (3, 3),
-            neighbourhood: Neighbourhood::Moore,
-        };
+        let default_rules = Rules{ ..Default::default() };
 
         if !path.is_empty() && fs::metadata(path).is_ok() {
             let json_rules = fs::read_to_string(path).unwrap();
