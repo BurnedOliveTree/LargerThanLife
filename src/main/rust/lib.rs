@@ -249,26 +249,26 @@ fn rust(_py: Python, m: &PyModule) -> PyResult<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    static LIFE_RULES: Rules = Rules {
+    static WAFFLE_RULES: Rules = Rules {
         cell: 2,
-        range: 1,
-        survival: (2, 3),
-        birth: (3, 3),
+        range: 7,
+        survival: (99, 199),
+        birth: (75, 170),
         neighbourhood: Neighbourhood::Moore,
     };
 
     #[test]
     fn test_load_rules_from_string() {
-        let user_input = "C:2;R:1;S:2-3;B:3;N:M";
+        let user_input = "C:2;R:7;S:99-199;B:75-170;N:M";
         let parsed_rules = Rules::parse(user_input, "");
-        assert_eq!(parsed_rules, LIFE_RULES);
+        assert_eq!(parsed_rules, WAFFLE_RULES);
     }
 
     #[test]
     fn test_load_rules_from_file() {
-        let path = "./res/rules/life.json";
+        let path = "./res/rules/waffle.json";
         let parsed_rules = Rules::parse("", path);
-        assert_eq!(parsed_rules, LIFE_RULES);
+        assert_eq!(parsed_rules, WAFFLE_RULES);
     }
     
     #[test]
