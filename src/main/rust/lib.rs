@@ -49,7 +49,6 @@ impl Default for Rules {
     }
 }
 
-
 #[pymethods]
 impl Rules {
     #[new]
@@ -71,7 +70,9 @@ impl Rules {
 
     #[staticmethod]
     fn parse_str(rules: &str) -> Self {
-        let default_rules = Rules{ ..Default::default() };
+        let default_rules = Rules {
+            ..Default::default()
+        };
         if !rules.is_empty() {
             let values: std::collections::HashMap<&str, &str> = rules
                 .split(';')
@@ -79,18 +80,12 @@ impl Rules {
                 .collect();
             let get_rule = |rule_acronym: &str| -> &str { values.get(rule_acronym).unwrap() };
             return Rules {
-                cell: get_rule("C")
-                    .parse::<u8>()
-                    .unwrap_or(default_rules.cell),
+                cell: get_rule("C").parse::<u8>().unwrap_or(default_rules.cell),
                 range: get_rule("R")
                     .parse::<usize>()
                     .unwrap_or(default_rules.range),
-                survival: get_rule("S")
-                    .from_str()
-                    .unwrap_or(default_rules.survival),
-                birth: get_rule("B")
-                    .from_str()
-                    .unwrap_or(default_rules.birth),
+                survival: get_rule("S").from_str().unwrap_or(default_rules.survival),
+                birth: get_rule("B").from_str().unwrap_or(default_rules.birth),
                 neighbourhood: Neighbourhood::from_str(get_rule("N"))
                     .unwrap_or(default_rules.neighbourhood),
             };
@@ -100,7 +95,9 @@ impl Rules {
 
     #[staticmethod]
     fn parse_file(path: &str) -> Self {
-        let default_rules = Rules{ ..Default::default() };
+        let default_rules = Rules {
+            ..Default::default()
+        };
         let json_rules = fs::read_to_string(path).unwrap();
         let rules: Rules = serde_json::from_str(&json_rules).unwrap_or(default_rules);
         return rules;
@@ -127,13 +124,26 @@ impl Engine {
         }
     }
 
-    fn do_count_alive_neighbours<F : Fn ((usize, usize), usize, usize) -> bool> (&self, point: (usize, usize), cond: F) -> u16 {
-        let lower_bound = |p| -> usize { if p > self.rules.range { p - self.rules.range } else { 0 }};
+    fn do_count_alive_neighbours<F: Fn((usize, usize), usize, usize) -> bool>(
+        &self,
+        point: (usize, usize),
+        cond: F,
+    ) -> u16 {
+        let lower_bound = |p| -> usize {
+            if p > self.rules.range {
+                p - self.rules.range
+            } else {
+                0
+            }
+        };
         let upper_bound = |p| -> usize { min(self.board_size - 1, p + self.rules.range) + 1 };
         let x_range: Range<usize> = lower_bound(point.0)..upper_bound(point.0);
         let y_range: Range<usize> = lower_bound(point.1)..upper_bound(point.1);
         return iproduct!(x_range, y_range).fold(0, |amount, (x, y)| {
-            if !(x == point.0 && y == point.1) && self.board[x][y] == self.rules.cell - 1 && cond(point, x, y) {
+            if !(x == point.0 && y == point.1)
+                && self.board[x][y] == self.rules.cell - 1
+                && cond(point, x, y)
+            {
                 amount + 1
             } else {
                 amount
@@ -151,10 +161,12 @@ impl Engine {
 
         match self.rules.neighbourhood {
             Neighbourhood::Moore => {
-                return Ok(self.do_count_alive_neighbours(point, |_, _, _| {true}));
+                return Ok(self.do_count_alive_neighbours(point, |_, _, _| true));
             }
             Neighbourhood::VonNeumann => {
-                return Ok(self.do_count_alive_neighbours(point, |point, x, y| {Engine::abs_diff(x, point.0) + Engine::abs_diff(y, point.1) <= self.rules.range}));
+                return Ok(self.do_count_alive_neighbours(point, |point, x, y| {
+                    Engine::abs_diff(x, point.0) + Engine::abs_diff(y, point.1) <= self.rules.range
+                }));
             }
         }
     }
@@ -169,7 +181,8 @@ impl Engine {
                     .into_iter()
                     .map(|field| field.parse::<u8>().unwrap())
                     .collect()
-            }).collect();
+            })
+            .collect();
         let len = data.len();
         return Ok((data, len));
     }
@@ -184,7 +197,7 @@ impl Engine {
         match board_path {
             Some(path) => {
                 (board, board_size) = Engine::parse(path).unwrap();
-            },
+            }
             None => {
                 let mut rng = rand::thread_rng();
                 let range = Uniform::new(0, 2);
@@ -194,7 +207,11 @@ impl Engine {
             }
         };
 
-        Engine { rules, board, board_size }
+        Engine {
+            rules,
+            board,
+            board_size,
+        }
     }
 
     pub fn board(&self) -> Vec<Vec<u8>> {
@@ -213,7 +230,8 @@ impl Engine {
         for (board_column, count_column) in izip!(self.board.iter_mut(), count.iter()) {
             for (board_value, count_value) in izip!(board_column.iter_mut(), count_column.iter()) {
                 if *board_value != 0 {
-                    if *count_value < self.rules.survival.0 || *count_value > self.rules.survival.1 {
+                    if *count_value < self.rules.survival.0 || *count_value > self.rules.survival.1
+                    {
                         *board_value -= 1;
                     }
                 } else if *board_value != self.rules.cell - 1 {
@@ -234,9 +252,7 @@ fn rust(_py: Python, m: &PyModule) -> PyResult<()> {
     Ok(())
 }
 
-
 // Tests -------------------------------------------------------------------------------------------
-
 
 #[cfg(test)]
 mod tests {
@@ -262,33 +278,37 @@ mod tests {
         let parsed_rules = Rules::parse("", path);
         assert_eq!(parsed_rules, WAFFLE_RULES);
     }
-    
+
     #[test]
     fn test_load_wrong_rules_from_file() {
         let path = "./res/rules/wrong.json";
         let parsed_rules = Rules::parse("", path);
-        assert_eq!(parsed_rules, 
-            Rules{
+        assert_eq!(
+            parsed_rules,
+            Rules {
                 cell: 2,
                 range: 1,
-                survival: (2,3),
-                birth: (113,115),
+                survival: (2, 3),
+                birth: (113, 115),
                 neighbourhood: Neighbourhood::Moore,
-            });
+            }
+        );
     }
-    
+
     #[test]
     fn test_load_wrong_rules_from_user_input() {
         let user_input = "C:\"2\";R:345;S:-5;B:113-115;N:6";
         let parsed_rules = Rules::parse(user_input, "");
-        assert_eq!(parsed_rules, 
-            Rules{
+        assert_eq!(
+            parsed_rules,
+            Rules {
                 cell: 2,
                 range: 1,
-                survival: (2,3),
-                birth: (113,115),
+                survival: (2, 3),
+                birth: (113, 115),
                 neighbourhood: Neighbourhood::Moore,
-            });
+            }
+        );
     }
 
     #[test]
@@ -297,13 +317,11 @@ mod tests {
         let parsed_rules = Rules::parse(user_input, "");
         assert_eq!(parsed_rules, WAFFLE_RULES);
     }
-        
 
     #[test]
     fn test_load_rules_from_not_existing_file() {
         assert_eq!(0, 0);
     }
-
 
     #[test]
     fn test_load_board_from_file() {
@@ -319,5 +337,4 @@ mod tests {
     fn test_update_board() {
         assert_eq!(0, 0);
     }
-
 }

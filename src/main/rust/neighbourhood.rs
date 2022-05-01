@@ -13,7 +13,10 @@ impl Neighbourhood {
         match string {
             "M" => Ok(Self::Moore),
             "N" => Ok(Self::VonNeumann),
-            _ => Err(format!("Tried to parse {} as a neighbourhood type.", string))
+            _ => Err(format!(
+                "Tried to parse {} as a neighbourhood type.",
+                string
+            )),
         }
     }
 }
