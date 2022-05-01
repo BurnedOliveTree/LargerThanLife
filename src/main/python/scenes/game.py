@@ -20,9 +20,10 @@ class Game(Window):
         scaled_bitmap_surface = pygame.transform.scale(
             bitmap_surface, (self.window_size, self.window_size)
         )
-        return scaled_bitmap_surface
+        # TODO find the reason for bitmap rotating here, probably make_surface
+        return pygame.transform.rotate(scaled_bitmap_surface, -90.0)
 
-    def render(self, screen, clock):
+    def render(self, screen: pygame.Surface, clock: pygame.time.Clock):
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
