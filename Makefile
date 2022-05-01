@@ -9,6 +9,7 @@ dev: install
 	maturin develop
 
 test: dev
+	cargo test
 	poetry run pytest
 
 run: dev
