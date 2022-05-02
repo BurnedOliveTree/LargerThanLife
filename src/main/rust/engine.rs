@@ -152,20 +152,34 @@ mod tests {
     use super::*;
     #[test]
     fn test_load_board_from_file() {
-        let path = "./res/boards/l_block.csv";
-        let (_, size) = Engine::parse((&path).to_string()).unwrap();
-        assert_eq!(size, 15);
+        let path = "./res/boards/l_test_blinker.csv";
+        let (board, size) = Engine::parse((&path).to_string()).unwrap();
+        assert_eq!(size, 3);
+        assert_eq!(board,vec![[0,0,0], [1,1,1], [0,0,0]]);
     }
 
     #[test]
     fn test_load_board_from_not_existing_file() {
         let path = "./res/boards/404.csv";
         let (_, size) = Engine::parse((&path).to_string()).unwrap();
-        assert_eq!(size, 20);
+        assert_eq!(size, 15);
     }
 
     #[test]
     fn test_update_board() {
-        assert_eq!(0, 0);
+        let path = "./res/boards/l_test_blinker.csv";
+        let rules = Rules {
+            cell: 2,
+            range: 1,
+            survival: (2, 3),
+            birth: (113, 115),
+            neighbourhood: Neighbourhood::Moore,
+        };
+        let mut engine = Engine::new(rules, 10, std::option::Option::Some(String::from(path)));
+        assert_eq!(engine.board, vec![[0,0,0], [1,1,1], [0,0,0]]);
+        engine.update();
+        assert_eq!(engine.board, vec![[0,1,0], [0,1,0], [0,1,0]]);
+        engine.update();
+        assert_eq!(engine.board, vec![[0,0,0], [1,1,1], [0,0,0]]);
     }
 }
