@@ -1,11 +1,11 @@
 use crate::neighbourhood::Neighbourhood;
 use crate::rules::Rules;
+
+use csv::{Error as CsvError, Reader, StringRecord};
 use itertools::{iproduct, izip};
 use pyo3::prelude::*;
 use rand::{distributions::Uniform, Rng};
-use std::cmp::min;
-use std::error::Error;
-use std::ops::Range;
+use std::{cmp::min, error::Error, ops::Range, option::Option::Some};
 
 #[pyclass]
 #[derive(Debug, Clone)]
@@ -73,10 +73,10 @@ impl Engine {
     }
 
     fn parse(path: String) -> Result<(Vec<Vec<u8>>, usize), Box<dyn Error>> {
-        let mut reader = csv::Reader::from_path(path)?;
+        let mut reader = Reader::from_path(path)?;
         let data: Vec<Vec<u8>> = reader
             .records()
-            .map(|record: Result<csv::StringRecord, csv::Error>| -> Vec<u8> {
+            .map(|record: Result<StringRecord, CsvError>| -> Vec<u8> {
                 record
                     .unwrap()
                     .into_iter()
@@ -175,7 +175,7 @@ mod tests {
             birth: (113, 115),
             neighbourhood: Neighbourhood::Moore,
         };
-        let mut engine = Engine::new(rules, 10, std::option::Option::Some(String::from(path)));
+        let mut engine = Engine::new(rules, 10, Some(String::from(path)));
         assert_eq!(engine.board, vec![[0,0,0], [1,1,1], [0,0,0]]);
         engine.update();
         assert_eq!(engine.board, vec![[0,1,0], [0,1,0], [0,1,0]]);
