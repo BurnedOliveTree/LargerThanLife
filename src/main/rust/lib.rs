@@ -98,7 +98,7 @@ impl Rules {
         let default_rules = Rules {
             ..Default::default()
         };
-        let json_rules = fs::read_to_string(path).unwrap();
+        let json_rules = fs::read_to_string(path).unwrap_or((&"").to_string());
         let rules: Rules = serde_json::from_str(&json_rules).unwrap_or(default_rules);
         return rules;
     }
@@ -179,7 +179,7 @@ impl Engine {
                 record
                     .unwrap()
                     .into_iter()
-                    .map(|field| field.parse::<u8>().unwrap())
+                    .map(|field| field.parse::<u8>().unwrap()))
                     .collect()
             })
             .collect();
@@ -266,13 +266,6 @@ mod tests {
     };
 
     #[test]
-    fn test_load_rules_from_string() {
-        let user_input = "C:2;R:7;S:99-199;B:75-170;N:M";
-        let parsed_rules = Rules::parse_str(user_input);
-        assert_eq!(parsed_rules, WAFFLE_RULES);
-    }
-
-    #[test]
     fn test_load_rules_from_file() {
         let path = "./res/rules/waffle.json";
         let parsed_rules = Rules::parse_file(path);
@@ -293,6 +286,29 @@ mod tests {
                 neighbourhood: Neighbourhood::Moore,
             }
         );
+    }
+
+    #[test]
+    fn test_load_rules_from_not_existing_file() {
+        let path = "./res/rules/404.json";
+        let parsed_rules = Rules::parse_file(path);
+        assert_eq!(
+            parsed_rules,
+            Rules {
+                cell: 2,
+                range: 1,
+                survival: (2, 3),
+                birth: (113, 115),
+                neighbourhood: Neighbourhood::Moore,
+            }
+        );
+    }
+
+    #[test]
+    fn test_load_rules_from_string() {
+        let user_input = "C:2;R:7;S:99-199;B:75-170;N:M";
+        let parsed_rules = Rules::parse_str(user_input);
+        assert_eq!(parsed_rules, WAFFLE_RULES);
     }
 
     #[test]
@@ -327,18 +343,17 @@ mod tests {
     }
 
     #[test]
-    fn test_load_rules_from_not_existing_file() {
-        assert_eq!(0, 0);
-    }
-
-    #[test]
     fn test_load_board_from_file() {
-        assert_eq!(0, 0);
+        let path = "./res/boards/l_block.csv";
+        let (_, size) = Engine::parse((&path).to_string()).unwrap();
+        assert_eq!(size, 15);
     }
 
     #[test]
     fn test_load_board_from_not_existing_file() {
-        assert_eq!(0, 0);
+        let path = "./res/boards/404.csv";
+        let (_, size) = Engine::parse((&path).to_string()).unwrap();
+        assert_eq!(size, 20);
     }
 
     #[test]
