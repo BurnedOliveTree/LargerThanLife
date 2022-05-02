@@ -88,12 +88,9 @@ impl Rules {
 
     #[staticmethod]
     fn parse_file(path: &str) -> Self {
-        let default_rules = Rules {
-            ..Default::default()
-        };
-        let json_rules = fs::read_to_string(path).unwrap_or((&"").to_string());
-        let rules: Rules = serde_json::from_str(&json_rules).unwrap_or(default_rules);
-        return rules;
+        return fs::read_to_string(path)
+            .and_then(|json| serde_json::from_str(&json).map_err(Into::into))
+            .unwrap_or(Rules { ..Default::default() });
     }
 }
 
@@ -123,13 +120,7 @@ mod tests {
         let parsed_rules = Rules::parse_file(path);
         assert_eq!(
             parsed_rules,
-            Rules {
-                cell: 2,
-                range: 1,
-                survival: (2, 3),
-                birth: (113, 115),
-                neighbourhood: Neighbourhood::Moore,
-            }
+            Rules { ..Default::default() }
         );
     }
 
@@ -139,13 +130,7 @@ mod tests {
         let parsed_rules = Rules::parse_file(path);
         assert_eq!(
             parsed_rules,
-            Rules {
-                cell: 2,
-                range: 1,
-                survival: (2, 3),
-                birth: (113, 115),
-                neighbourhood: Neighbourhood::Moore,
-            }
+            Rules { ..Default::default() }
         );
     }
 
@@ -162,13 +147,7 @@ mod tests {
         let parsed_rules = Rules::parse_str(user_input);
         assert_eq!(
             parsed_rules,
-            Rules {
-                cell: 2,
-                range: 1,
-                survival: (2, 3),
-                birth: (113, 115),
-                neighbourhood: Neighbourhood::Moore,
-            }
+            Rules { ..Default::default() }
         );
     }
 
