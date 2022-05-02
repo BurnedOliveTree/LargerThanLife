@@ -76,9 +76,9 @@ impl Rules {
         if !rules.is_empty() {
             let values: std::collections::HashMap<&str, &str> = rules
                 .split(';')
-                .map(|element| element.split_once(':').unwrap())
+                .map(|element| element.split_once(':').unwrap_or(("", "")))
                 .collect();
-            let get_rule = |rule_acronym: &str| -> &str { values.get(rule_acronym).unwrap() };
+            let get_rule = |rule_acronym: &str| -> &str { values.get(rule_acronym).unwrap_or(&"") };
             return Rules {
                 cell: get_rule("C").parse::<u8>().unwrap_or(default_rules.cell),
                 range: get_rule("R")
@@ -268,21 +268,21 @@ mod tests {
     #[test]
     fn test_load_rules_from_string() {
         let user_input = "C:2;R:7;S:99-199;B:75-170;N:M";
-        let parsed_rules = Rules::parse(user_input, "");
+        let parsed_rules = Rules::parse_str(user_input);
         assert_eq!(parsed_rules, WAFFLE_RULES);
     }
 
     #[test]
     fn test_load_rules_from_file() {
         let path = "./res/rules/waffle.json";
-        let parsed_rules = Rules::parse("", path);
+        let parsed_rules = Rules::parse_file(path);
         assert_eq!(parsed_rules, WAFFLE_RULES);
     }
 
     #[test]
     fn test_load_wrong_rules_from_file() {
         let path = "./res/rules/wrong.json";
-        let parsed_rules = Rules::parse("", path);
+        let parsed_rules = Rules::parse_file(path);
         assert_eq!(
             parsed_rules,
             Rules {
@@ -298,7 +298,7 @@ mod tests {
     #[test]
     fn test_load_wrong_rules_from_user_input() {
         let user_input = "C:\"2\";R:345;S:-5;B:113-115;N:6";
-        let parsed_rules = Rules::parse(user_input, "");
+        let parsed_rules = Rules::parse_str(user_input);
         assert_eq!(
             parsed_rules,
             Rules {
@@ -312,10 +312,18 @@ mod tests {
     }
 
     #[test]
-    fn test_load_strate_user_input_for_rules() {
+    fn test_load_strange_user_input_for_rules() {
         let user_input = "ABC";
-        let parsed_rules = Rules::parse(user_input, "");
-        assert_eq!(parsed_rules, WAFFLE_RULES);
+        let parsed_rules = Rules::parse_str(user_input);
+        assert_eq!(parsed_rules, 
+            Rules {
+                cell: 2,
+                range: 1,
+                survival: (2, 3),
+                birth: (3, 3),
+                neighbourhood: Neighbourhood::Moore,
+            }
+        );
     }
 
     #[test]
