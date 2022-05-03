@@ -31,15 +31,31 @@ impl RangeParser for &str {
         if self.contains('-') {
             let (value1, value2) = self.split_once('-').unwrap();
             return Ok(Range {
-                start: value1.parse::<u16>().unwrap(),
-                end: value2.parse::<u16>().unwrap(),
+                start: value1.parse::<u16>()?,
+                end: value2.parse::<u16>()?,
             });
         } else {
             return Ok(Range {
-                start: self.parse::<u16>().unwrap(),
-                end: self.parse::<u16>().unwrap(),
+                start: self.parse::<u16>()?,
+                end: self.parse::<u16>()?,
             });
         }
+    }
+}
+
+trait Normalizable {
+    fn normalize(self, lower: Self, upper: Self) -> Self;
+}
+
+impl Normalizable for u8 {
+    fn normalize(self, lower: u8, upper: u8) -> Self {
+        return if self < lower { lower } else if self > upper { upper } else { self }
+    }
+}
+
+impl Normalizable for usize {
+    fn normalize(self, lower: usize, upper: usize) -> Self {
+        return if self < lower { lower } else if self > upper { upper } else { self }
     }
 }
 
@@ -58,7 +74,7 @@ impl Default for Rules {
 #[pymethods]
 impl Rules {
     #[new]
-    fn new(
+    pub fn new(
         cell: u8,
         range: usize,
         survival: Range,
@@ -75,7 +91,7 @@ impl Rules {
     }
 
     #[staticmethod]
-    fn from_str(rules: &str) -> Self {
+    pub fn from_str(rules: &str) -> Self {
         let default_rules = Rules {
             ..Default::default()
         };
@@ -86,10 +102,10 @@ impl Rules {
                 .collect();
             let get_rule = |rule_acronym: &str| -> &str { values.get(rule_acronym).unwrap_or(&"") };
             return Rules {
-                cell: get_rule("C").parse::<u8>().unwrap_or(default_rules.cell),
+                cell: get_rule("C").parse::<u8>().unwrap_or(default_rules.cell).normalize(2, 255),
                 range: get_rule("R")
                     .parse::<usize>()
-                    .unwrap_or(default_rules.range),
+                    .unwrap_or(default_rules.range).normalize(1, 255),
                 survival: get_rule("S").from_str().unwrap_or(default_rules.survival),
                 birth: get_rule("B").from_str().unwrap_or(default_rules.birth),
                 neighbourhood: Neighbourhood::from_str(get_rule("N"))
@@ -100,7 +116,7 @@ impl Rules {
     }
 
     #[staticmethod]
-    fn from_file(path: &str) -> Self {
+    pub fn from_file(path: &str) -> Self {
         return read_to_string(path)
             .and_then(|json| serde_json::from_str(&json).map_err(Into::into))
             .unwrap_or(Rules {
@@ -168,7 +184,7 @@ mod tests {
 
     #[test]
     fn test_load_wrong_rules_from_user_input() {
-        let user_input = "C:\"20\";R:345;S:-5;B:113-115;N:6";
+        let user_input = "C:1;R:345;S:-5;B:\"113-115\";N:6";
         let parsed_rules = Rules::from_str(user_input);
         assert_eq!(
             parsed_rules,
@@ -177,8 +193,8 @@ mod tests {
                 range: 255,
                 survival: Range { start: 2, end: 3 },
                 birth: Range {
-                    start: 113,
-                    end: 115
+                    start: 3,
+                    end: 3
                 },
                 neighbourhood: Neighbourhood::Moore,
             }

@@ -72,7 +72,15 @@ impl Engine {
         }
     }
 
-    fn parse(path: String) -> Result<(Vec<Vec<u8>>, usize), Box<dyn Error>> {
+    fn generate_random_board(size: usize) -> (Vec<Vec<u8>>, usize) {
+        let mut rng = rand::thread_rng();
+        let range = Uniform::new(0, 2);
+        return ((0..size)
+            .map(|_| (0..size).map(|_| rng.sample(&range)).collect())
+            .collect(), size);
+    }
+
+    fn from_file(path: String) -> Result<(Vec<Vec<u8>>, usize), Box<dyn Error>> {
         let mut reader = Reader::from_path(path)?;
         let data: Vec<Vec<u8>> = reader
             .records()
@@ -93,19 +101,9 @@ impl Engine {
 impl Engine {
     #[new]
     fn new(rules: Rules, size: usize, board_path: Option<String>) -> Self {
-        let mut board_size = size;
-        let board: Vec<Vec<u8>>;
-        match board_path {
-            Some(path) => {
-                (board, board_size) = Engine::parse(path).unwrap();
-            }
-            None => {
-                let mut rng = rand::thread_rng();
-                let range = Uniform::new(0, 2);
-                board = (0..board_size)
-                    .map(|_| (0..board_size).map(|_| rng.sample(&range)).collect())
-                    .collect();
-            }
+        let (board, board_size) = match board_path {
+            Some(path) => Engine::from_file(path).unwrap_or(Engine::generate_random_board(size)),
+            None => Engine::generate_random_board(size)
         };
 
         Engine {
@@ -155,26 +153,23 @@ mod tests {
     use super::*;
     #[test]
     fn test_load_board_from_file() {
-        let path = "./res/boards/l_test_blinker.csv";
-        let (board, size) = Engine::parse((&path).to_string()).unwrap();
-        assert_eq!(size, 3);
-        assert_eq!(board, vec![[0, 0, 0], [1, 1, 1], [0, 0, 0]]);
+        let path = String::from("./res/boards/l_test_blinker.csv");
+        let engine = Engine::new(Rules { ..Default::default() }, 600, Some(path));
+        assert_eq!(engine.board_size, 3);
+        assert_eq!(engine.board, vec![[0, 0, 0], [1, 1, 1], [0, 0, 0]]);
     }
 
     #[test]
     fn test_load_board_from_not_existing_file() {
-        let path = "./res/boards/404.csv";
-        let (_, size) = Engine::parse((&path).to_string()).unwrap();
-        assert_eq!(size, 15);
+        let path = String::from("./res/boards/404.csv");
+        let engine = Engine::new(Rules { ..Default::default() }, 600, Some(path));
+        assert_eq!(engine.board_size, 600);
     }
 
     #[test]
     fn test_update_board() {
-        let path = "./res/boards/l_test_blinker.csv";
-        let rules = Rules {
-            ..Default::default()
-        };
-        let mut engine = Engine::new(rules, 10, Some(String::from(path)));
+        let path = String::from("./res/boards/l_test_blinker.csv");
+        let mut engine = Engine::new(Rules { ..Default::default() }, 600, Some(path));
         assert_eq!(engine.board, vec![[0, 0, 0], [1, 1, 1], [0, 0, 0]]);
         engine.update();
         assert_eq!(engine.board, vec![[0, 1, 0], [0, 1, 0], [0, 1, 0]]);
