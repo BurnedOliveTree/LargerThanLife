@@ -131,12 +131,15 @@ impl Engine {
         for (board_column, count_column) in izip!(self.board.iter_mut(), count.iter()) {
             for (board_value, count_value) in izip!(board_column.iter_mut(), count_column.iter()) {
                 if *board_value != 0 {
-                    if *count_value < self.rules.survival.start || *count_value > self.rules.survival.end
+                    if *count_value < self.rules.survival.start
+                        || *count_value > self.rules.survival.end
                     {
                         *board_value -= 1;
                     }
                 } else if *board_value != self.rules.cell - 1 {
-                    if *count_value >= self.rules.birth.start && *count_value <= self.rules.birth.end {
+                    if *count_value >= self.rules.birth.start
+                        && *count_value <= self.rules.birth.end
+                    {
                         *board_value = self.rules.cell - 1;
                     }
                 }
@@ -155,7 +158,7 @@ mod tests {
         let path = "./res/boards/l_test_blinker.csv";
         let (board, size) = Engine::parse((&path).to_string()).unwrap();
         assert_eq!(size, 3);
-        assert_eq!(board,vec![[0,0,0], [1,1,1], [0,0,0]]);
+        assert_eq!(board, vec![[0, 0, 0], [1, 1, 1], [0, 0, 0]]);
     }
 
     #[test]
@@ -168,12 +171,14 @@ mod tests {
     #[test]
     fn test_update_board() {
         let path = "./res/boards/l_test_blinker.csv";
-        let rules = Rules { ..Default::default() };
+        let rules = Rules {
+            ..Default::default()
+        };
         let mut engine = Engine::new(rules, 10, Some(String::from(path)));
-        assert_eq!(engine.board, vec![[0,0,0], [1,1,1], [0,0,0]]);
+        assert_eq!(engine.board, vec![[0, 0, 0], [1, 1, 1], [0, 0, 0]]);
         engine.update();
-        assert_eq!(engine.board, vec![[0,1,0], [0,1,0], [0,1,0]]);
+        assert_eq!(engine.board, vec![[0, 1, 0], [0, 1, 0], [0, 1, 0]]);
         engine.update();
-        assert_eq!(engine.board, vec![[0,0,0], [1,1,1], [0,0,0]]);
+        assert_eq!(engine.board, vec![[0, 0, 0], [1, 1, 1], [0, 0, 0]]);
     }
 }

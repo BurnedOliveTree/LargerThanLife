@@ -1,5 +1,5 @@
 use pyo3::prelude::*;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[pyclass]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]

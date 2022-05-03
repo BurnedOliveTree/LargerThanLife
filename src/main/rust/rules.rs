@@ -1,16 +1,15 @@
 use crate::neighbourhood::Neighbourhood;
 
 use pyo3::prelude::*;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fs::read_to_string, num::ParseIntError};
 
 #[pyclass]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Range {
     pub start: u16,
-    pub end: u16
+    pub end: u16,
 }
-
 
 #[pyclass]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -31,9 +30,15 @@ impl RangeParser for &str {
     fn from_str(&self) -> Result<Range, ParseIntError> {
         if self.contains('-') {
             let (value1, value2) = self.split_once('-').unwrap();
-            return Ok(Range {start: value1.parse::<u16>().unwrap(), end: value2.parse::<u16>().unwrap()});
+            return Ok(Range {
+                start: value1.parse::<u16>().unwrap(),
+                end: value2.parse::<u16>().unwrap(),
+            });
         } else {
-            return Ok(Range {start: self.parse::<u16>().unwrap(), end: self.parse::<u16>().unwrap()});
+            return Ok(Range {
+                start: self.parse::<u16>().unwrap(),
+                end: self.parse::<u16>().unwrap(),
+            });
         }
     }
 }
@@ -43,14 +48,8 @@ impl Default for Rules {
         Rules {
             cell: 2,
             range: 1,
-            survival: Range {
-                            start: 2, 
-                            end: 3
-                        },
-            birth:  Range {
-                start: 3, 
-                end: 3
-            },
+            survival: Range { start: 2, end: 3 },
+            birth: Range { start: 3, end: 3 },
             neighbourhood: Neighbourhood::Moore,
         }
     }
@@ -77,7 +76,9 @@ impl Rules {
 
     #[staticmethod]
     fn from_str(rules: &str) -> Self {
-        let default_rules = Rules { ..Default::default() };
+        let default_rules = Rules {
+            ..Default::default()
+        };
         if !rules.is_empty() {
             let values: HashMap<&str, &str> = rules
                 .split(';')
@@ -102,7 +103,9 @@ impl Rules {
     fn from_file(path: &str) -> Self {
         return read_to_string(path)
             .and_then(|json| serde_json::from_str(&json).map_err(Into::into))
-            .unwrap_or(Rules { ..Default::default() });
+            .unwrap_or(Rules {
+                ..Default::default()
+            });
     }
 }
 
@@ -114,8 +117,14 @@ mod tests {
     static WAFFLE_RULES: Rules = Rules {
         cell: 2,
         range: 7,
-        survival: Range { start: 99, end: 199},
-        birth: Range{start:75, end: 170},
+        survival: Range {
+            start: 99,
+            end: 199,
+        },
+        birth: Range {
+            start: 75,
+            end: 170,
+        },
         neighbourhood: Neighbourhood::Moore,
     };
 
@@ -132,7 +141,9 @@ mod tests {
         let parsed_rules = Rules::from_file(path);
         assert_eq!(
             parsed_rules,
-            Rules { ..Default::default() }
+            Rules {
+                ..Default::default()
+            }
         );
     }
 
@@ -142,7 +153,9 @@ mod tests {
         let parsed_rules = Rules::from_file(path);
         assert_eq!(
             parsed_rules,
-            Rules { ..Default::default() }
+            Rules {
+                ..Default::default()
+            }
         );
     }
 
@@ -159,11 +172,14 @@ mod tests {
         let parsed_rules = Rules::from_str(user_input);
         assert_eq!(
             parsed_rules,
-            Rules { 
+            Rules {
                 cell: 2,
                 range: 255,
-                survival: Range{start:2, end:3},
-                birth: Range{start: 113, end: 115},
+                survival: Range { start: 2, end: 3 },
+                birth: Range {
+                    start: 113,
+                    end: 115
+                },
                 neighbourhood: Neighbourhood::Moore,
             }
         );
@@ -175,7 +191,9 @@ mod tests {
         let parsed_rules = Rules::from_str(user_input);
         assert_eq!(
             parsed_rules,
-            Rules { ..Default::default() }
+            Rules {
+                ..Default::default()
+            }
         );
     }
 }
