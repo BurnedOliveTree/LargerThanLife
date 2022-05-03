@@ -131,12 +131,12 @@ impl Engine {
         for (board_column, count_column) in izip!(self.board.iter_mut(), count.iter()) {
             for (board_value, count_value) in izip!(board_column.iter_mut(), count_column.iter()) {
                 if *board_value != 0 {
-                    if *count_value < self.rules.survival.0 || *count_value > self.rules.survival.1
+                    if *count_value < self.rules.survival.start || *count_value > self.rules.survival.end
                     {
                         *board_value -= 1;
                     }
                 } else if *board_value != self.rules.cell - 1 {
-                    if *count_value >= self.rules.birth.0 && *count_value <= self.rules.birth.1 {
+                    if *count_value >= self.rules.birth.start && *count_value <= self.rules.birth.end {
                         *board_value = self.rules.cell - 1;
                     }
                 }
@@ -168,13 +168,7 @@ mod tests {
     #[test]
     fn test_update_board() {
         let path = "./res/boards/l_test_blinker.csv";
-        let rules = Rules {
-            cell: 2,
-            range: 1,
-            survival: (2, 3),
-            birth: (113, 115),
-            neighbourhood: Neighbourhood::Moore,
-        };
+        let rules = Rules { ..Default::default() };
         let mut engine = Engine::new(rules, 10, Some(String::from(path)));
         assert_eq!(engine.board, vec![[0,0,0], [1,1,1], [0,0,0]]);
         engine.update();

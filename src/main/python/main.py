@@ -23,9 +23,9 @@ if __name__ == "__main__":
             scene = menu.render(screen, clock)
         elif scene == Scene.GAME:
             if menu.path_text_box.text != "":
-                rules = Rules.parse_file(menu.path_text_box.text)
+                rules = Rules.from_file(menu.path_text_box.text)
             else:
-                rules = Rules.parse_str(menu.rules_text_box.text)
+                rules = Rules.from_str(menu.rules_text_box.text)
             game.set_rules(rules, menu.board_text_box.text)
             scene = game.render(screen, clock)
         elif scene is None:

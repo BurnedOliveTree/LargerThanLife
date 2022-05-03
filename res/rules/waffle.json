@@ -1,7 +1,15 @@
 {
     "cell": 2,
     "range": 7,
-    "survival": "99-199",
-    "birth": "75-170",
-    "neighbourhood": "M"
+    "survival": {
+        "start": 99,
+        "end": 199
+    },
+    "birth":{
+        "start": 75,
+        "end": 170
+    },
+    "neighbourhood": {
+        "type": "Moore"
+    }
 }

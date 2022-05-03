@@ -1,32 +1,39 @@
 use crate::neighbourhood::Neighbourhood;
 
 use pyo3::prelude::*;
-use serde::Deserialize;
+use serde::{Serialize, Deserialize};
 use std::{collections::HashMap, fs::read_to_string, num::ParseIntError};
-use tuple_transpose::TupleTranspose;
 
 #[pyclass]
-#[derive(Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct Range {
+    pub start: u16,
+    pub end: u16
+}
+
+
+#[pyclass]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Rules {
     // TODO check
     pub cell: u8,
     pub range: usize,
-    pub survival: (u16, u16),
-    pub birth: (u16, u16),
+    pub survival: Range,
+    pub birth: Range,
     pub neighbourhood: Neighbourhood,
 }
 
 trait RangeParser {
-    fn from_str(&self) -> Result<(u16, u16), ParseIntError>;
+    fn from_str(&self) -> Result<Range, ParseIntError>;
 }
 
 impl RangeParser for &str {
-    fn from_str(&self) -> Result<(u16, u16), ParseIntError> {
+    fn from_str(&self) -> Result<Range, ParseIntError> {
         if self.contains('-') {
             let (value1, value2) = self.split_once('-').unwrap();
-            return (value1.parse::<u16>(), value2.parse::<u16>()).transpose();
+            return Ok(Range {start: value1.parse::<u16>().unwrap(), end: value2.parse::<u16>().unwrap()});
         } else {
-            return (self.parse::<u16>(), self.parse::<u16>()).transpose();
+            return Ok(Range {start: self.parse::<u16>().unwrap(), end: self.parse::<u16>().unwrap()});
         }
     }
 }
@@ -36,8 +43,14 @@ impl Default for Rules {
         Rules {
             cell: 2,
             range: 1,
-            survival: (2, 3),
-            birth: (3, 3),
+            survival: Range {
+                            start: 2, 
+                            end: 3
+                        },
+            birth:  Range {
+                start: 3, 
+                end: 3
+            },
             neighbourhood: Neighbourhood::Moore,
         }
     }
@@ -49,8 +62,8 @@ impl Rules {
     fn new(
         cell: u8,
         range: usize,
-        survival: (u16, u16),
-        birth: (u16, u16),
+        survival: Range,
+        birth: Range,
         neighbourhood: Neighbourhood,
     ) -> Self {
         Rules {
@@ -101,8 +114,8 @@ mod tests {
     static WAFFLE_RULES: Rules = Rules {
         cell: 2,
         range: 7,
-        survival: (99, 199),
-        birth: (75, 170),
+        survival: Range { start: 99, end: 199},
+        birth: Range{start:75, end: 170},
         neighbourhood: Neighbourhood::Moore,
     };
 
@@ -149,8 +162,8 @@ mod tests {
             Rules { 
                 cell: 2,
                 range: 255,
-                survival: (2, 3),
-                birth: (113, 115),
+                survival: Range{start:2, end:3},
+                birth: Range{start: 113, end: 115},
                 neighbourhood: Neighbourhood::Moore,
             }
         );

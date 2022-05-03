@@ -1,8 +1,9 @@
 use pyo3::prelude::*;
-use serde::Deserialize;
+use serde::{Serialize, Deserialize};
 
 #[pyclass]
-#[derive(Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(tag = "type")]
 pub enum Neighbourhood {
     Moore,
     VonNeumann,

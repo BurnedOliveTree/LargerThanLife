@@ -1,7 +1,15 @@
 {
     "cell": "2",
     "range": 345,
-    "survival": -5,
-    "birth": "113-115",
-    "neighbourhood": "6"
+    "survival": {
+        "start": -1,
+        "end": -5
+    },
+    "birth": {
+        "start": 113,
+        "end": 115
+    },
+    "neighbourhood": {
+        "type": "6"
+    }
 }
