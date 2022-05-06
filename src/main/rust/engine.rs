@@ -75,9 +75,12 @@ impl Engine {
     fn generate_random_board(size: usize) -> (Vec<Vec<u8>>, usize) {
         let mut rng = rand::thread_rng();
         let range = Uniform::new(0, 2);
-        return ((0..size)
-            .map(|_| (0..size).map(|_| rng.sample(&range)).collect())
-            .collect(), size);
+        return (
+            (0..size)
+                .map(|_| (0..size).map(|_| rng.sample(&range)).collect())
+                .collect(),
+            size,
+        );
     }
 
     fn from_file(path: String) -> Result<(Vec<Vec<u8>>, usize), Box<dyn Error>> {
@@ -103,7 +106,7 @@ impl Engine {
     fn new(rules: Rules, size: usize, board_path: Option<String>) -> Self {
         let (board, board_size) = match board_path {
             Some(path) => Engine::from_file(path).unwrap_or(Engine::generate_random_board(size)),
-            None => Engine::generate_random_board(size)
+            None => Engine::generate_random_board(size),
         };
 
         Engine {
@@ -154,7 +157,13 @@ mod tests {
     #[test]
     fn test_load_board_from_file() {
         let path = String::from("./res/boards/l_test_blinker.csv");
-        let engine = Engine::new(Rules { ..Default::default() }, 600, Some(path));
+        let engine = Engine::new(
+            Rules {
+                ..Default::default()
+            },
+            600,
+            Some(path),
+        );
         assert_eq!(engine.board_size, 3);
         assert_eq!(engine.board, vec![[0, 0, 0], [1, 1, 1], [0, 0, 0]]);
     }
@@ -162,14 +171,26 @@ mod tests {
     #[test]
     fn test_load_board_from_not_existing_file() {
         let path = String::from("./res/boards/404.csv");
-        let engine = Engine::new(Rules { ..Default::default() }, 600, Some(path));
+        let engine = Engine::new(
+            Rules {
+                ..Default::default()
+            },
+            600,
+            Some(path),
+        );
         assert_eq!(engine.board_size, 600);
     }
 
     #[test]
     fn test_update_board() {
         let path = String::from("./res/boards/l_test_blinker.csv");
-        let mut engine = Engine::new(Rules { ..Default::default() }, 600, Some(path));
+        let mut engine = Engine::new(
+            Rules {
+                ..Default::default()
+            },
+            600,
+            Some(path),
+        );
         assert_eq!(engine.board, vec![[0, 0, 0], [1, 1, 1], [0, 0, 0]]);
         engine.update();
         assert_eq!(engine.board, vec![[0, 1, 0], [0, 1, 0], [0, 1, 0]]);

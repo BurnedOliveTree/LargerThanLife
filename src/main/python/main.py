@@ -27,6 +27,9 @@ if __name__ == "__main__":
             else:
                 rules = Rules.from_str(menu.rules_text_box.text)
             game.set_rules(rules, menu.board_text_box.text)
+            game.set_description_labels(
+                menu.path_text_box.text, menu.board_text_box.text
+            )
             scene = game.render(screen, clock)
         elif scene is None:
             sys.exit()

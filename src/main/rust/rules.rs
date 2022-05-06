@@ -49,13 +49,25 @@ trait Normalizable {
 
 impl Normalizable for u8 {
     fn normalize(self, lower: u8, upper: u8) -> Self {
-        return if self < lower { lower } else if self > upper { upper } else { self }
+        return if self < lower {
+            lower
+        } else if self > upper {
+            upper
+        } else {
+            self
+        };
     }
 }
 
 impl Normalizable for usize {
     fn normalize(self, lower: usize, upper: usize) -> Self {
-        return if self < lower { lower } else if self > upper { upper } else { self }
+        return if self < lower {
+            lower
+        } else if self > upper {
+            upper
+        } else {
+            self
+        };
     }
 }
 
@@ -102,10 +114,14 @@ impl Rules {
                 .collect();
             let get_rule = |rule_acronym: &str| -> &str { values.get(rule_acronym).unwrap_or(&"") };
             return Rules {
-                cell: get_rule("C").parse::<u8>().unwrap_or(default_rules.cell).normalize(2, 255),
+                cell: get_rule("C")
+                    .parse::<u8>()
+                    .unwrap_or(default_rules.cell)
+                    .normalize(2, 255),
                 range: get_rule("R")
                     .parse::<usize>()
-                    .unwrap_or(default_rules.range).normalize(1, 255),
+                    .unwrap_or(default_rules.range)
+                    .normalize(1, 255),
                 survival: get_rule("S").from_str().unwrap_or(default_rules.survival),
                 birth: get_rule("B").from_str().unwrap_or(default_rules.birth),
                 neighbourhood: Neighbourhood::from_str(get_rule("N"))
@@ -192,10 +208,7 @@ mod tests {
                 cell: 2,
                 range: 255,
                 survival: Range { start: 2, end: 3 },
-                birth: Range {
-                    start: 3,
-                    end: 3
-                },
+                birth: Range { start: 3, end: 3 },
                 neighbourhood: Neighbourhood::Moore,
             }
         );
