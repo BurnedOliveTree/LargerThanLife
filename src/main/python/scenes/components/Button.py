@@ -5,14 +5,12 @@ class Button(Component):
     def __init__(
         self,
         text,
-        width,
-        height,
         coordinates,
         active_color,
         passive_color,
         invoke_scene_name,
     ):
-        super().__init__(text, width, height, coordinates, active_color, passive_color)
+        super().__init__(text, coordinates, active_color, passive_color, None)
         self.invoke_scene_name = invoke_scene_name
 
     def set_status(self, position):

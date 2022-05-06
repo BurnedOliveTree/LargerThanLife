@@ -1,36 +1,24 @@
-from scenes.components.Component import Component
+from scenes.components.Component import Component, TextLabel
 import pygame
 
 
 class InputTextBox(Component):
+    default_width = 200
+    
     def __init__(
-        self, width, height, coordinates, active_color, passive_color, description
+        self, coordinates, active_color, passive_color, description
     ):
-        super().__init__("", width, height, coordinates, active_color, passive_color)
-        self.description = description
-
-    def draw_description(self, screen):
-        description_surface = self.font.render(self.description, True, self.text_color)
-        description_width = description_surface.get_width()
-        screen.blit(
-            description_surface,
-            (
-                self.coordinates[0] - description_width,
-                self.coordinates[1],
-            ),
-        )
+        super().__init__("", coordinates, active_color, passive_color)
+        self.description_label = TextLabel(description)
 
     def draw(self, screen):
-        self.draw_description(screen)
-        text_surface = self.font.render(self.text, True, self.text_color)
-        self.rect.w = max(text_surface.get_width() + Component.padding, self.width)
+        self.description_label.draw(screen, self.coordinates[0] - self.description_label.get_width(),self.coordinates[1])
+        self.text_label.update_text(self.text)
+        self.rect.w = max(self.text_label.get_width() + Component.padding, InputTextBox.default_width)
 
         self.change_color()
         pygame.draw.rect(screen, self.color, self.rect, Component.border_width)
-        screen.blit(
-            text_surface,
-            (self.rect.x + Component.padding, self.rect.y + Component.padding),
-        )
+        self.text_label.draw(screen, self.rect.x + Component.padding, self.rect.y + Component.padding)
 
     def get_text_after_event(self, event):
         if event.key == pygame.K_BACKSPACE:
