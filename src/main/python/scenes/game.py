@@ -19,35 +19,42 @@ class Game(Window):
         path = None if path == "" else path
         self.engine = Engine(rules, self.board_size, path)
 
-    def colored_text_label(text, flag):
+    def rule_text_label(self, text, flag):
         return TextLabel(
             text, color=TextLabel.highlight_color if flag is True else None
         )
+    
+    def file_text_label(self, default_text, filename, flag):
+        if flag is True:
+            return TextLabel(default_text, color=TextLabel.highlight_color)
+        else:
+            return TextLabel(default_text+filename)
 
     def set_description_labels(self, rules_path, board_path):
+        rules = self.engine.rules
+        flags = rules.flags
         self.preferences = [
-            TextLabel(f"Rules file: {rules_path}"),
-            TextLabel(f"Board file: {board_path}"),
+            self.file_text_label("Rules file: ", rules_path, flags.f_load_incorrect),
+            self.file_text_label("Board file: ", board_path, self.engine.flags.b_load_incorrect),
             TextLabel(""),
             TextLabel("Rules"),
-            # TODO usunac lancuszki
-            self.colored_text_label(
-                f"C: {self.engine.rules.cell}", self.engine.rules.flags.d_cell
+            self.rule_text_label(
+                f"C: {rules.cell}",flags.d_cell
             ),
-            self.colored_text_label(
-                f"R: {self.engine.rules.range}", self.engine.rules.flags.d_range
+            self.rule_text_label(
+                f"R: {rules.range}", flags.d_range
             ),
-            self.colored_text_label(
-                f"S: {self.engine.rules.survival.start} - {self.engine.rules.survival.end}",
-                self.engine.rules.flags.d_survival,
+            self.rule_text_label(
+                f"S: {rules.survival.start} - {rules.survival.end}",
+                flags.d_survival,
             ),
-            self.colored_text_label(
-                f"B: {self.engine.rules.birth.start} - {self.engine.rules.birth.end}",
-                self.engine.rules.flags.d_birth,
+            self.rule_text_label(
+                f"B: {rules.birth.start} - {rules.birth.end}",
+                flags.d_birth,
             ),
-            self.colored_text_label(
-                f"N: {str(self.engine.rules.neighbourhood).split('.')[1]}",
-                self.engine.rules.flags.d_neighbourhood,
+            self.rule_text_label(
+                f"N: {str(rules.neighbourhood).split('.')[1]}",
+                flags.d_neighbourhood,
             ),
         ]
 

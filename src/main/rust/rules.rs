@@ -5,8 +5,8 @@ use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fs::read_to_string, num::ParseIntError};
 
 #[pyclass]
-#[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq)]
-pub struct Flags {
+#[derive(Default, Debug, Clone, PartialEq)]
+pub struct RFlags {
     #[pyo3(get)]
     pub d_cell: bool,
     #[pyo3(get)]
@@ -17,6 +17,8 @@ pub struct Flags {
     pub d_birth: bool,
     #[pyo3(get)]
     pub d_neighbourhood: bool,
+    #[pyo3(get)]
+    pub f_load_incorrect: bool,
 }
 
 #[pyclass]
@@ -43,7 +45,8 @@ pub struct Rules {
     #[pyo3(get)]
     pub neighbourhood: Neighbourhood,
     #[pyo3(get)]
-    pub flags: Flags,
+    #[serde(skip)]
+    pub flags: RFlags,
 }
 
 trait RangeParser {
@@ -103,7 +106,7 @@ impl Default for Rules {
             survival: Range { start: 2, end: 3 },
             birth: Range { start: 3, end: 3 },
             neighbourhood: Neighbourhood::Moore,
-            flags: Flags {
+            flags: RFlags {
                 ..Default::default()
             },
         }
@@ -126,7 +129,7 @@ impl Rules {
             survival,
             birth,
             neighbourhood,
-            flags: Flags {
+            flags: RFlags {
                 ..Default::default()
             },
         }
@@ -137,7 +140,7 @@ impl Rules {
         let default_rules = Rules {
             ..Default::default()
         };
-        let mut flags = Flags {
+        let mut flags = RFlags {
             ..Default::default()
         };
         if !rules.is_empty() {
@@ -189,6 +192,14 @@ impl Rules {
         read_to_string(path)
             .and_then(|json| serde_json::from_str(&json).map_err(Into::into))
             .unwrap_or(Rules {
+                flags: RFlags {
+                    d_cell: true,
+                    d_range: true,
+                    d_survival: true,
+                    d_birth: true,
+                    d_neighbourhood: true,
+                    f_load_incorrect: true
+                },
                 ..Default::default()
             })
     }

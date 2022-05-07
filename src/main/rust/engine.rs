@@ -16,6 +16,15 @@ pub struct Engine {
     rules: Rules,
     board: Grid,
     board_size: usize,
+    #[pyo3(get)]
+    flags: EFlags
+}
+
+#[pyclass]
+#[derive(Debug, Clone, Default)]
+pub struct EFlags {
+    #[pyo3(get)]
+    pub b_load_incorrect: bool
 }
 
 impl Engine {
@@ -105,9 +114,14 @@ impl Engine {
 impl Engine {
     #[new]
     fn new(rules: Rules, size: usize, board_path: Option<String>) -> Self {
+        let mut flags = EFlags {
+            ..Default::default()
+        };
         let (board, board_size) = match board_path {
             Some(path) => {
-                Engine::from_file(path).unwrap_or_else(|_| Engine::generate_random_board(size))
+                Engine::from_file(path).map_err(|_| {
+                    flags.b_load_incorrect = true;
+                }).unwrap_or_else(|_| Engine::generate_random_board(size))
             }
             None => Engine::generate_random_board(size),
         };
@@ -116,6 +130,7 @@ impl Engine {
             rules,
             board,
             board_size,
+            flags
         }
     }
 
