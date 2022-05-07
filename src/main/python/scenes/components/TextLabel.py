@@ -8,14 +8,16 @@ class TextLabel:
     color = pygame.Color("white")
     highlight_color = pygame.Color("pink")
 
-    def __init__(self, text=None, color=None):
+    def __init__(self, text=None, color=None, coordinates=None):
         self.color = color if color is not None else TextLabel.color
         self.text = text
+        self.coordinates = coordinates
         self.font = pygame.font.Font(None, TextLabel.font_size)
         self.text_surface = self.font.render(self.text, True, self.color)
 
-    def draw(self, screen, x, y):
-        screen.blit(self.text_surface, (x, y))
+    def draw(self, screen, x=None, y=None):
+        coordinates = (x, y) if x is not None and y is not None else self.coordinates
+        screen.blit(self.text_surface, coordinates)
 
     def update_color(self, color):
         self.color = color

@@ -39,6 +39,7 @@ class Menu(Window):
         )
 
     def draw_title(self, screen):
+        # TODO change to textlabel
         font = pygame.font.Font(None, 48)
         text = font.render("Larger than Life", True, pygame.Color("#FA58B6"))
         text_rect = text.get_rect()

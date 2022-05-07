@@ -2,13 +2,15 @@ from scenes.components.Component import Component
 
 
 class Button(Component):
+    margin = 15
+
     def __init__(
         self,
         text,
         coordinates,
         active_color,
         passive_color,
-        invoke_scene_name,
+        invoke_scene_name=None,
     ):
         super().__init__(text, coordinates, active_color, passive_color, None)
         self.invoke_scene_name = invoke_scene_name
