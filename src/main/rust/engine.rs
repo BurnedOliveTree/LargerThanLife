@@ -41,7 +41,7 @@ impl Engine {
         let upper_bound = |p| -> usize { min(self.board_size - 1, p + self.rules.range) + 1 };
         let x_range: Range<usize> = lower_bound(point.0)..upper_bound(point.0);
         let y_range: Range<usize> = lower_bound(point.1)..upper_bound(point.1);
-        return iproduct!(x_range, y_range).fold(0, |amount, (x, y)| {
+        iproduct!(x_range, y_range).fold(0, |amount, (x, y)| {
             if !(x == point.0 && y == point.1)
                 && self.board[x][y] == self.rules.cell - 1
                 && cond(point, x, y)
@@ -50,7 +50,7 @@ impl Engine {
             } else {
                 amount
             }
-        });
+        })
     }
 
     fn count_alive_neighbours(&self, point: (usize, usize)) -> Result<u16, String> {
@@ -62,13 +62,11 @@ impl Engine {
         }
 
         match self.rules.neighbourhood {
-            Neighbourhood::Moore => {
-                return Ok(self.do_count_alive_neighbours(point, |_, _, _| true));
-            }
+            Neighbourhood::Moore => Ok(self.do_count_alive_neighbours(point, |_, _, _| true)),
             Neighbourhood::VonNeumann => {
-                return Ok(self.do_count_alive_neighbours(point, |point, x, y| {
+                Ok(self.do_count_alive_neighbours(point, |point, x, y| {
                     Engine::abs_diff(x, point.0) + Engine::abs_diff(y, point.1) <= self.rules.range
-                }));
+                }))
             }
         }
     }
@@ -76,12 +74,12 @@ impl Engine {
     fn generate_random_board(size: usize) -> (Vec<Vec<u8>>, usize) {
         let mut rng = rand::thread_rng();
         let range = Uniform::new(0, 2);
-        return (
+        (
             (0..size)
                 .map(|_| (0..size).map(|_| rng.sample(&range)).collect())
                 .collect(),
             size,
-        );
+        )
     }
 
     fn from_file(path: String) -> Result<(Vec<Vec<u8>>, usize), Box<dyn Error>> {
@@ -97,7 +95,7 @@ impl Engine {
             })
             .collect();
         let len = data.len();
-        return Ok((data, len));
+        Ok((data, len))
     }
 }
 
@@ -106,7 +104,9 @@ impl Engine {
     #[new]
     fn new(rules: Rules, size: usize, board_path: Option<String>) -> Self {
         let (board, board_size) = match board_path {
-            Some(path) => Engine::from_file(path).unwrap_or(Engine::generate_random_board(size)),
+            Some(path) => {
+                Engine::from_file(path).unwrap_or_else(|_| Engine::generate_random_board(size))
+            }
             None => Engine::generate_random_board(size),
         };
 
@@ -138,12 +138,11 @@ impl Engine {
                     {
                         *board_value -= 1;
                     }
-                } else if *board_value != self.rules.cell - 1 {
-                    if *count_value >= self.rules.birth.start
-                        && *count_value <= self.rules.birth.end
-                    {
-                        *board_value = self.rules.cell - 1;
-                    }
+                } else if *board_value != self.rules.cell - 1
+                    && *count_value >= self.rules.birth.start
+                    && *count_value <= self.rules.birth.end
+                {
+                    *board_value = self.rules.cell - 1;
                 }
             }
         }

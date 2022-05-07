@@ -37,15 +37,15 @@ impl RangeParser for &str {
     fn from_str(&self) -> Result<Range, ParseIntError> {
         if self.contains('-') {
             let (value1, value2) = self.split_once('-').unwrap();
-            return Ok(Range {
+            Ok(Range {
                 start: value1.parse::<u16>()?,
                 end: value2.parse::<u16>()?,
-            });
+            })
         } else {
-            return Ok(Range {
+            Ok(Range {
                 start: self.parse::<u16>()?,
                 end: self.parse::<u16>()?,
-            });
+            })
         }
     }
 }
@@ -56,25 +56,25 @@ trait Normalizable {
 
 impl Normalizable for u8 {
     fn normalize(self, lower: u8, upper: u8) -> Self {
-        return if self < lower {
+        if self < lower {
             lower
         } else if self > upper {
             upper
         } else {
             self
-        };
+        }
     }
 }
 
 impl Normalizable for usize {
     fn normalize(self, lower: usize, upper: usize) -> Self {
-        return if self < lower {
+        if self < lower {
             lower
         } else if self > upper {
             upper
         } else {
             self
-        };
+        }
     }
 }
 
@@ -135,16 +135,16 @@ impl Rules {
                     .unwrap_or(default_rules.neighbourhood),
             };
         }
-        return default_rules;
+        default_rules
     }
 
     #[staticmethod]
     pub fn from_file(path: &str) -> Self {
-        return read_to_string(path)
+        read_to_string(path)
             .and_then(|json| serde_json::from_str(&json).map_err(Into::into))
             .unwrap_or(Rules {
                 ..Default::default()
-            });
+            })
     }
 }
 
