@@ -10,6 +10,7 @@ use std::{cmp::min, error::Error, ops::Range, option::Option::Some};
 #[pyclass]
 #[derive(Debug, Clone)]
 pub struct Engine {
+    #[pyo3(get)]
     rules: Rules,
     board: Vec<Vec<u8>>,
     board_size: usize,

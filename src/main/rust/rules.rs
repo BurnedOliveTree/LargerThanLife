@@ -7,7 +7,9 @@ use std::{collections::HashMap, fs::read_to_string, num::ParseIntError};
 #[pyclass]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Range {
+    #[pyo3(get)]
     pub start: u16,
+    #[pyo3(get)]
     pub end: u16,
 }
 
@@ -15,10 +17,15 @@ pub struct Range {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Rules {
     // TODO check
+    #[pyo3(get)]
     pub cell: u8,
+    #[pyo3(get)]
     pub range: usize,
+    #[pyo3(get)]
     pub survival: Range,
+    #[pyo3(get)]
     pub birth: Range,
+    #[pyo3(get)]
     pub neighbourhood: Neighbourhood,
 }
 
