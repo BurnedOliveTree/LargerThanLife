@@ -162,14 +162,14 @@ impl Rules {
                         flags.d_cell = true;
                     })
                     .unwrap_or(default_rules.cell)
-                    .normalize(2, 255),
+                    .normalize(2, 255), // TODO hoist the flag
                 range: get_rule("R")
                     .parse::<usize>()
                     .map_err(|_| {
                         flags.d_range = true;
                     })
                     .unwrap_or(default_rules.range)
-                    .normalize(1, 255),
+                    .normalize(1, 255), // TODO hoist the flag
                 survival: get_rule("S")
                     .from_str()
                     .map_err(|_| {
@@ -280,6 +280,7 @@ mod tests {
                 survival: Range { start: 2, end: 3 },
                 birth: Range { start: 3, end: 3 },
                 neighbourhood: Neighbourhood::Moore,
+                flags: RFlags { ..Default::default() },
             }
         );
     }

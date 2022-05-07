@@ -76,8 +76,10 @@ class Game(Window):
         ]
 
     def get_surface_from_bitmap(self, bitmap):
-        scaled_color_bitmap = 255 * bitmap
-        bitmap_surface = pygame.surfarray.make_surface(scaled_color_bitmap)
+        bitmap = 255 * (bitmap / bitmap.max())
+        grayscale_bitmap = np.empty((*bitmap.shape, 3), dtype=np.uint8)
+        grayscale_bitmap[:, :, 2] = grayscale_bitmap[:, :, 1] = grayscale_bitmap[:, :, 0] = bitmap
+        bitmap_surface = pygame.surfarray.make_surface(grayscale_bitmap)
         bitmap_size = self.window_size - Game.width_displacement
         scaled_bitmap_surface = pygame.transform.scale(
             bitmap_surface, (bitmap_size, bitmap_size)

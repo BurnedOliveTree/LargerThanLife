@@ -57,6 +57,7 @@ class Menu(Window):
                     self.board_text_box.set_status(event.pos)
                     game_screen = self.start_game_button.set_status(event.pos)
                     if game_screen is not None:
+                        self.start_game_button.set_status((-1, -1))
                         return game_screen
                 if event.type == pygame.KEYDOWN:
                     if self.rules_text_box.is_active is True:

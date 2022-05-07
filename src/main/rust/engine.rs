@@ -81,9 +81,9 @@ impl Engine {
         }
     }
 
-    fn generate_random_board(size: usize) -> (Grid, usize) {
+    fn generate_random_board(size: usize, rules: &Rules) -> (Grid, usize) {
         let mut rng = rand::thread_rng();
-        let range = Uniform::new(0, 2);
+        let range = Uniform::new(0, rules.cell);
         (
             (0..size)
                 .map(|_| (0..size).map(|_| rng.sample(&range)).collect())
@@ -121,8 +121,8 @@ impl Engine {
                 .map_err(|_| {
                     flags.f_load_incorrect = true;
                 })
-                .unwrap_or_else(|_| Engine::generate_random_board(size)),
-            None => Engine::generate_random_board(size),
+                .unwrap_or_else(|_| Engine::generate_random_board(size, &rules)),
+            None => Engine::generate_random_board(size, &rules),
         };
 
         Engine {
