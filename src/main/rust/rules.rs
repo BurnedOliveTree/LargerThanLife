@@ -198,7 +198,7 @@ impl Rules {
                     d_survival: true,
                     d_birth: true,
                     d_neighbourhood: true,
-                    f_load_incorrect: true
+                    f_load_incorrect: true,
                 },
                 ..Default::default()
             })

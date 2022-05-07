@@ -23,27 +23,25 @@ class Game(Window):
         return TextLabel(
             text, color=TextLabel.highlight_color if flag is True else None
         )
-    
+
     def file_text_label(self, default_text, filename, flag):
         if flag is True:
             return TextLabel(default_text, color=TextLabel.highlight_color)
         else:
-            return TextLabel(default_text+filename)
+            return TextLabel(default_text + filename)
 
     def set_description_labels(self, rules_path, board_path):
         rules = self.engine.rules
         flags = rules.flags
         self.preferences = [
             self.file_text_label("Rules file: ", rules_path, flags.f_load_incorrect),
-            self.file_text_label("Board file: ", board_path, self.engine.flags.b_load_incorrect),
+            self.file_text_label(
+                "Board file: ", board_path, self.engine.flags.b_load_incorrect
+            ),
             TextLabel(""),
             TextLabel("Rules"),
-            self.rule_text_label(
-                f"C: {rules.cell}",flags.d_cell
-            ),
-            self.rule_text_label(
-                f"R: {rules.range}", flags.d_range
-            ),
+            self.rule_text_label(f"C: {rules.cell}", flags.d_cell),
+            self.rule_text_label(f"R: {rules.range}", flags.d_range),
             self.rule_text_label(
                 f"S: {rules.survival.start} - {rules.survival.end}",
                 flags.d_survival,
