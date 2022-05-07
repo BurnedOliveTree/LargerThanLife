@@ -31,8 +31,8 @@ class Game(Window):
             coordinates=(self.window_size - 150, Counter.margin),
             active_color=pygame.Color("#FA58B6"),
             passive_color=pygame.Color("#7A0BC0"),
-            min=1,
-            max=60,
+            minimum=1,
+            maximum=60,
         )
 
     def set_rules(self, rules: Rules, path: str):

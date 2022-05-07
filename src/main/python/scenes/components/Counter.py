@@ -5,10 +5,10 @@ from scenes.components.TextLabel import TextLabel
 class Counter:
     margin = 15
 
-    def __init__(self, value, coordinates, active_color, passive_color, min, max):
+    def __init__(self, value, coordinates, active_color, passive_color, minimum, maximum):
         self.value = value
-        self.min = min
-        self.max = max
+        self.minimum = minimum
+        self.maximum = maximum
         self.minus_button = Button(
             text="-",
             coordinates=(coordinates[0], coordinates[1]),
@@ -34,12 +34,12 @@ class Counter:
         return self.value
 
     def increase_value(self):
-        if self.value < max:
+        if self.value < self.maximum:
             self.value += 1
             self.value_label.update_text(f"{self.value} FPS")
 
     def decrease_value(self):
-        if self.value > min:
+        if self.value > self.minimum:
             self.value -= 1
             self.value_label.update_text(f"{self.value} FPS")
 
