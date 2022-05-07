@@ -7,12 +7,14 @@ use pyo3::prelude::*;
 use rand::{distributions::Uniform, Rng};
 use std::{cmp::min, error::Error, ops::Range, option::Option::Some};
 
+type Grid = Vec<Vec<u8>>;
+
 #[pyclass]
 #[derive(Debug, Clone)]
 pub struct Engine {
     #[pyo3(get)]
     rules: Rules,
-    board: Vec<Vec<u8>>,
+    board: Grid,
     board_size: usize,
 }
 
@@ -71,7 +73,7 @@ impl Engine {
         }
     }
 
-    fn generate_random_board(size: usize) -> (Vec<Vec<u8>>, usize) {
+    fn generate_random_board(size: usize) -> (Grid, usize) {
         let mut rng = rand::thread_rng();
         let range = Uniform::new(0, 2);
         (
@@ -82,9 +84,9 @@ impl Engine {
         )
     }
 
-    fn from_file(path: String) -> Result<(Vec<Vec<u8>>, usize), Box<dyn Error>> {
+    fn from_file(path: String) -> Result<(Grid, usize), Box<dyn Error>> {
         let mut reader = Reader::from_path(path)?;
-        let data: Vec<Vec<u8>> = reader
+        let data: Grid = reader
             .records()
             .map(|record: Result<StringRecord, CsvError>| -> Vec<u8> {
                 record
@@ -117,7 +119,7 @@ impl Engine {
         }
     }
 
-    pub fn board(&self) -> Vec<Vec<u8>> {
+    pub fn board(&self) -> Grid {
         self.board.to_vec()
     }
 
