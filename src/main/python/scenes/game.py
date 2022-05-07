@@ -32,27 +32,26 @@ class Game(Window):
 
     def set_description_labels(self, rules_path, board_path):
         rules = self.engine.rules
-        flags = rules.flags
         self.preferences = [
-            self.file_text_label("Rules file: ", rules_path, flags.f_load_incorrect),
+            self.file_text_label("Rules file: ", rules_path, rules.get_flag("FNF")),
             self.file_text_label(
-                "Board file: ", board_path, self.engine.flags.b_load_incorrect
+                "Board file: ", board_path, self.engine.get_flag("FNF")
             ),
             TextLabel(""),
             TextLabel("Rules"),
-            self.rule_text_label(f"C: {rules.cell}", flags.d_cell),
-            self.rule_text_label(f"R: {rules.range}", flags.d_range),
+            self.rule_text_label(f"C: {rules.cell}", rules.get_flag("DC")),
+            self.rule_text_label(f"R: {rules.range}", rules.get_flag("DR")),
             self.rule_text_label(
                 f"S: {rules.survival.start} - {rules.survival.end}",
-                flags.d_survival,
+                rules.get_flag("DS"),
             ),
             self.rule_text_label(
                 f"B: {rules.birth.start} - {rules.birth.end}",
-                flags.d_birth,
+                rules.get_flag("DB"),
             ),
             self.rule_text_label(
                 f"N: {str(rules.neighbourhood).split('.')[1]}",
-                flags.d_neighbourhood,
+                rules.get_flag("DN"),
             ),
         ]
 
@@ -84,7 +83,6 @@ class Game(Window):
             pre_bitmap = self.engine.board()
             bitmap = np.array([np.array(xi) for xi in pre_bitmap])
             background = self.get_surface_from_bitmap(bitmap)
-            # TODO uwzglednic w grze przesuniecie
             screen.blit(background, (Game.width_displacement, Game.height_displacement))
 
             pygame.display.update()

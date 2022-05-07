@@ -23,8 +23,7 @@ pub struct Engine {
 #[pyclass]
 #[derive(Debug, Clone, Default)]
 pub struct EFlags {
-    #[pyo3(get)]
-    pub b_load_incorrect: bool,
+    pub f_load_incorrect: bool,
 }
 
 impl Engine {
@@ -120,7 +119,7 @@ impl Engine {
         let (board, board_size) = match board_path {
             Some(path) => Engine::from_file(path)
                 .map_err(|_| {
-                    flags.b_load_incorrect = true;
+                    flags.f_load_incorrect = true;
                 })
                 .unwrap_or_else(|_| Engine::generate_random_board(size)),
             None => Engine::generate_random_board(size),
@@ -136,6 +135,13 @@ impl Engine {
 
     pub fn board(&self) -> Grid {
         self.board.to_vec()
+    }
+
+    pub fn get_flag(&self, flag_name: &str) -> bool {
+        match flag_name {
+            "FNF" => self.flags.f_load_incorrect,
+            _ => false,
+        }
     }
 
     pub fn update(&mut self) {

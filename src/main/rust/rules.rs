@@ -7,17 +7,11 @@ use std::{collections::HashMap, fs::read_to_string, num::ParseIntError};
 #[pyclass]
 #[derive(Default, Debug, Clone, PartialEq)]
 pub struct RFlags {
-    #[pyo3(get)]
     pub d_cell: bool,
-    #[pyo3(get)]
     pub d_range: bool,
-    #[pyo3(get)]
     pub d_survival: bool,
-    #[pyo3(get)]
     pub d_birth: bool,
-    #[pyo3(get)]
     pub d_neighbourhood: bool,
-    #[pyo3(get)]
     pub f_load_incorrect: bool,
 }
 
@@ -132,6 +126,18 @@ impl Rules {
             flags: RFlags {
                 ..Default::default()
             },
+        }
+    }
+
+    pub fn get_flag(&self, flag_name: &str) -> bool {
+        match flag_name {
+            "DC" => self.flags.d_cell,
+            "DR" => self.flags.d_range,
+            "DS" => self.flags.d_survival,
+            "DB" => self.flags.d_birth,
+            "DN" => self.flags.d_neighbourhood,
+            "FNF" => self.flags.f_load_incorrect,
+            _ => false,
         }
     }
 
