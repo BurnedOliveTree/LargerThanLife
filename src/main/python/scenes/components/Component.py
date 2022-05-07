@@ -36,7 +36,6 @@ class Component:
             return dimesion + Component.padding * 2
 
     def draw(self, screen):
-        self.change_color()
         pygame.draw.rect(
             screen, self.color, self.rect, border_radius=Component.border_radius
         )
