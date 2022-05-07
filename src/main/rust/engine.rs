@@ -86,9 +86,9 @@ impl Engine {
             .records()
             .map(|record: Result<StringRecord, CsvError>| -> Vec<u8> {
                 record
-                    .unwrap()
+                    .unwrap() // TODO
                     .into_iter()
-                    .map(|field| field.parse::<u8>().unwrap())
+                    .map(|field| field.parse::<u8>().unwrap()) // TODO
                     .collect()
             })
             .collect();
