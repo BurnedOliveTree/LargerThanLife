@@ -1,4 +1,3 @@
-from typing import Text
 import pygame
 import numpy as np
 from scenes import Window
@@ -25,7 +24,7 @@ class Game(Window):
             TextLabel(f"Rules file: {rules_path}"),
             TextLabel(f"Board file: {board_path}"),
             TextLabel(""),
-            TextLabel(f"Rules"),
+            TextLabel("Rules"),
             TextLabel(f"C: {self.engine.rules.cell}"),
             TextLabel(f"R: {self.engine.rules.range}"),
             TextLabel(

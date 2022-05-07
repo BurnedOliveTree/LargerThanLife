@@ -19,9 +19,9 @@ docs: dev
 	cargo doc --open --document-private-items
 
 lint:
-	poetry run flcaake8
+	cargo clippy
+	poetry run flake8
 
 format:
 	cargo fmt
-	cargo clippy
 	poetry run black src/main/python/

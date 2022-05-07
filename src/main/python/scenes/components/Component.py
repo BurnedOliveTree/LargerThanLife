@@ -1,4 +1,3 @@
-from typing import Text
 import pygame
 
 from scenes.components.TextLabel import TextLabel
