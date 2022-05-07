@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fs::read_to_string, num::ParseIntError};
 
 #[pyclass]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq)]
 pub struct Flags {
     #[pyo3(get)]
     pub d_cell: bool,
@@ -16,22 +16,8 @@ pub struct Flags {
     #[pyo3(get)]
     pub d_birth: bool,
     #[pyo3(get)]
-    pub d_neighbourhood: bool
+    pub d_neighbourhood: bool,
 }
-
-
-impl Default for Flags {
-    fn default() -> Flags {
-        Flags {
-            d_cell: false,
-            d_range: false,
-            d_survival: false,
-            d_birth: false,
-            d_neighbourhood: false,
-        }
-    }
-}
-
 
 #[pyclass]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -117,7 +103,9 @@ impl Default for Rules {
             survival: Range { start: 2, end: 3 },
             birth: Range { start: 3, end: 3 },
             neighbourhood: Neighbourhood::Moore,
-            flags: Flags { ..Default::default() }
+            flags: Flags {
+                ..Default::default()
+            },
         }
     }
 }
@@ -138,7 +126,9 @@ impl Rules {
             survival,
             birth,
             neighbourhood,
-            flags: Flags { ..Default::default() }
+            flags: Flags {
+                ..Default::default()
+            },
         }
     }
 
@@ -159,17 +149,36 @@ impl Rules {
             return Rules {
                 cell: get_rule("C")
                     .parse::<u8>()
-                    .unwrap_or_else(|_|{flags.d_cell = true; default_rules.cell})
+                    .map_err(|_| {
+                        flags.d_cell = true;
+                    })
+                    .unwrap_or(default_rules.cell)
                     .normalize(2, 255),
                 range: get_rule("R")
                     .parse::<usize>()
+                    .map_err(|_| {
+                        flags.d_range = true;
+                    })
                     .unwrap_or(default_rules.range)
                     .normalize(1, 255),
-                survival: get_rule("S").from_str().unwrap_or(default_rules.survival),
-                birth: get_rule("B").from_str().unwrap_or(default_rules.birth),
+                survival: get_rule("S")
+                    .from_str()
+                    .map_err(|_| {
+                        flags.d_survival = true;
+                    })
+                    .unwrap_or(default_rules.survival),
+                birth: get_rule("B")
+                    .from_str()
+                    .map_err(|_| {
+                        flags.d_birth = true;
+                    })
+                    .unwrap_or(default_rules.birth),
                 neighbourhood: Neighbourhood::from_str(get_rule("N"))
+                    .map_err(|_| {
+                        flags.d_neighbourhood = true;
+                    })
                     .unwrap_or(default_rules.neighbourhood),
-                flags: flags,
+                flags,
             };
         }
         default_rules

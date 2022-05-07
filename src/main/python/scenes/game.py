@@ -19,21 +19,36 @@ class Game(Window):
         path = None if path == "" else path
         self.engine = Engine(rules, self.board_size, path)
 
+    def colored_text_label(text, flag):
+        return TextLabel(
+            text, color=TextLabel.highlight_color if flag is True else None
+        )
+
     def set_description_labels(self, rules_path, board_path):
         self.preferences = [
             TextLabel(f"Rules file: {rules_path}"),
             TextLabel(f"Board file: {board_path}"),
             TextLabel(""),
             TextLabel("Rules"),
-            TextLabel(f"C: {self.engine.rules.cell}", color=TextLabel.highlight_color if self.engine.rules.flags.d_cell == True else None),
-            TextLabel(f"R: {self.engine.rules.range}"),
-            TextLabel(
-                f"S: {self.engine.rules.survival.start} - {self.engine.rules.survival.end}"
+            # TODO usunac lancuszki
+            self.colored_text_label(
+                f"C: {self.engine.rules.cell}", self.engine.rules.flags.d_cell
             ),
-            TextLabel(
-                f"B: {self.engine.rules.birth.start} - {self.engine.rules.birth.end}"
+            self.colored_text_label(
+                f"R: {self.engine.rules.range}", self.engine.rules.flags.d_range
             ),
-            TextLabel(f"N: {str(self.engine.rules.neighbourhood).split('.')[1]}"),
+            self.colored_text_label(
+                f"S: {self.engine.rules.survival.start} - {self.engine.rules.survival.end}",
+                self.engine.rules.flags.d_survival,
+            ),
+            self.colored_text_label(
+                f"B: {self.engine.rules.birth.start} - {self.engine.rules.birth.end}",
+                self.engine.rules.flags.d_birth,
+            ),
+            self.colored_text_label(
+                f"N: {str(self.engine.rules.neighbourhood).split('.')[1]}",
+                self.engine.rules.flags.d_neighbourhood,
+            ),
         ]
 
     def get_surface_from_bitmap(self, bitmap):
