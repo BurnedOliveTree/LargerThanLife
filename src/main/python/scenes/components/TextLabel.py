@@ -6,9 +6,10 @@ class TextLabel:
     padding = 10
     margin = 10
     color = pygame.Color("white")
+    highlight_color = pygame.Color("pink")
 
-    def __init__(self, text=None):
-        self.color = TextLabel.color
+    def __init__(self, text=None, color=None):
+        self.color = color if color is not None else TextLabel.color
         self.text = text
         self.font = pygame.font.Font(None, TextLabel.font_size)
         self.text_surface = self.font.render(self.text, True, self.color)

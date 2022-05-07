@@ -6,6 +6,35 @@ use std::{collections::HashMap, fs::read_to_string, num::ParseIntError};
 
 #[pyclass]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct Flags {
+    #[pyo3(get)]
+    pub d_cell: bool,
+    #[pyo3(get)]
+    pub d_range: bool,
+    #[pyo3(get)]
+    pub d_survival: bool,
+    #[pyo3(get)]
+    pub d_birth: bool,
+    #[pyo3(get)]
+    pub d_neighbourhood: bool
+}
+
+
+impl Default for Flags {
+    fn default() -> Flags {
+        Flags {
+            d_cell: false,
+            d_range: false,
+            d_survival: false,
+            d_birth: false,
+            d_neighbourhood: false,
+        }
+    }
+}
+
+
+#[pyclass]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Range {
     #[pyo3(get)]
     pub start: u16,
@@ -27,6 +56,8 @@ pub struct Rules {
     pub birth: Range,
     #[pyo3(get)]
     pub neighbourhood: Neighbourhood,
+    #[pyo3(get)]
+    pub flags: Flags,
 }
 
 trait RangeParser {
@@ -86,6 +117,7 @@ impl Default for Rules {
             survival: Range { start: 2, end: 3 },
             birth: Range { start: 3, end: 3 },
             neighbourhood: Neighbourhood::Moore,
+            flags: Flags { ..Default::default() }
         }
     }
 }
@@ -106,12 +138,16 @@ impl Rules {
             survival,
             birth,
             neighbourhood,
+            flags: Flags { ..Default::default() }
         }
     }
 
     #[staticmethod]
     pub fn from_str(rules: &str) -> Self {
         let default_rules = Rules {
+            ..Default::default()
+        };
+        let mut flags = Flags {
             ..Default::default()
         };
         if !rules.is_empty() {
@@ -123,7 +159,7 @@ impl Rules {
             return Rules {
                 cell: get_rule("C")
                     .parse::<u8>()
-                    .unwrap_or(default_rules.cell)
+                    .unwrap_or_else(|_|{flags.d_cell = true; default_rules.cell})
                     .normalize(2, 255),
                 range: get_rule("R")
                     .parse::<usize>()
@@ -133,6 +169,7 @@ impl Rules {
                 birth: get_rule("B").from_str().unwrap_or(default_rules.birth),
                 neighbourhood: Neighbourhood::from_str(get_rule("N"))
                     .unwrap_or(default_rules.neighbourhood),
+                flags: flags,
             };
         }
         default_rules

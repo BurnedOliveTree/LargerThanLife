@@ -25,7 +25,7 @@ class Game(Window):
             TextLabel(f"Board file: {board_path}"),
             TextLabel(""),
             TextLabel("Rules"),
-            TextLabel(f"C: {self.engine.rules.cell}"),
+            TextLabel(f"C: {self.engine.rules.cell}", color=TextLabel.highlight_color if self.engine.rules.flags.d_cell == True else None),
             TextLabel(f"R: {self.engine.rules.range}"),
             TextLabel(
                 f"S: {self.engine.rules.survival.start} - {self.engine.rules.survival.end}"
