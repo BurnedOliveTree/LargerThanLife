@@ -7,7 +7,9 @@ use std::{collections::HashMap, fs::read_to_string, num::ParseIntError};
 #[pyclass]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Range {
+    #[pyo3(get)]
     pub start: u16,
+    #[pyo3(get)]
     pub end: u16,
 }
 
@@ -15,10 +17,15 @@ pub struct Range {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Rules {
     // TODO check
+    #[pyo3(get)]
     pub cell: u8,
+    #[pyo3(get)]
     pub range: usize,
+    #[pyo3(get)]
     pub survival: Range,
+    #[pyo3(get)]
     pub birth: Range,
+    #[pyo3(get)]
     pub neighbourhood: Neighbourhood,
 }
 
@@ -30,15 +37,15 @@ impl RangeParser for &str {
     fn from_str(&self) -> Result<Range, ParseIntError> {
         if self.contains('-') {
             let (value1, value2) = self.split_once('-').unwrap();
-            return Ok(Range {
+            Ok(Range {
                 start: value1.parse::<u16>()?,
                 end: value2.parse::<u16>()?,
-            });
+            })
         } else {
-            return Ok(Range {
+            Ok(Range {
                 start: self.parse::<u16>()?,
                 end: self.parse::<u16>()?,
-            });
+            })
         }
     }
 }
@@ -49,13 +56,25 @@ trait Normalizable {
 
 impl Normalizable for u8 {
     fn normalize(self, lower: u8, upper: u8) -> Self {
-        return if self < lower { lower } else if self > upper { upper } else { self }
+        if self < lower {
+            lower
+        } else if self > upper {
+            upper
+        } else {
+            self
+        }
     }
 }
 
 impl Normalizable for usize {
     fn normalize(self, lower: usize, upper: usize) -> Self {
-        return if self < lower { lower } else if self > upper { upper } else { self }
+        if self < lower {
+            lower
+        } else if self > upper {
+            upper
+        } else {
+            self
+        }
     }
 }
 
@@ -102,26 +121,30 @@ impl Rules {
                 .collect();
             let get_rule = |rule_acronym: &str| -> &str { values.get(rule_acronym).unwrap_or(&"") };
             return Rules {
-                cell: get_rule("C").parse::<u8>().unwrap_or(default_rules.cell).normalize(2, 255),
+                cell: get_rule("C")
+                    .parse::<u8>()
+                    .unwrap_or(default_rules.cell)
+                    .normalize(2, 255),
                 range: get_rule("R")
                     .parse::<usize>()
-                    .unwrap_or(default_rules.range).normalize(1, 255),
+                    .unwrap_or(default_rules.range)
+                    .normalize(1, 255),
                 survival: get_rule("S").from_str().unwrap_or(default_rules.survival),
                 birth: get_rule("B").from_str().unwrap_or(default_rules.birth),
                 neighbourhood: Neighbourhood::from_str(get_rule("N"))
                     .unwrap_or(default_rules.neighbourhood),
             };
         }
-        return default_rules;
+        default_rules
     }
 
     #[staticmethod]
     pub fn from_file(path: &str) -> Self {
-        return read_to_string(path)
+        read_to_string(path)
             .and_then(|json| serde_json::from_str(&json).map_err(Into::into))
             .unwrap_or(Rules {
                 ..Default::default()
-            });
+            })
     }
 }
 
@@ -192,10 +215,7 @@ mod tests {
                 cell: 2,
                 range: 255,
                 survival: Range { start: 2, end: 3 },
-                birth: Range {
-                    start: 3,
-                    end: 3
-                },
+                birth: Range { start: 3, end: 3 },
                 neighbourhood: Neighbourhood::Moore,
             }
         );

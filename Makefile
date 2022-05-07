@@ -13,12 +13,13 @@ test: dev
 	poetry run pytest
 
 run: dev
-	python3 src/main/python/main.py
+	python src/main/python/main.py
 
 docs: dev
 	cargo doc --open --document-private-items
 
 lint:
+	cargo clippy
 	poetry run flake8
 
 format:

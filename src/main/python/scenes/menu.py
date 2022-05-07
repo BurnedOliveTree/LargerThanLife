@@ -7,8 +7,6 @@ class Menu(Window):
     def __init__(self, window_size, FPS):
         super().__init__(window_size, FPS)
         self.rules_text_box = InputTextBox(
-            width=200,
-            height=None,
             coordinates=(self.window_size // 2, self.window_size * 5 // 12),
             active_color=pygame.Color("#FA58B6"),
             passive_color=pygame.Color("#7A0BC0"),
@@ -16,8 +14,6 @@ class Menu(Window):
         )
 
         self.path_text_box = InputTextBox(
-            width=200,
-            height=None,
             coordinates=(self.window_size // 2, self.window_size * 6 // 12),
             active_color=pygame.Color("#FA58B6"),
             passive_color=pygame.Color("#7A0BC0"),
@@ -25,8 +21,6 @@ class Menu(Window):
         )
 
         self.board_text_box = InputTextBox(
-            width=200,
-            height=None,
             coordinates=(self.window_size // 2, self.window_size * 7 // 12),
             active_color=pygame.Color("#FA58B6"),
             passive_color=pygame.Color("#7A0BC0"),
@@ -35,8 +29,6 @@ class Menu(Window):
 
         self.start_game_button = Button(
             text="Start game",
-            width=None,
-            height=None,
             coordinates=(
                 (self.window_size // 2) - 50,
                 (self.window_size * 3 // 4) - 25,
