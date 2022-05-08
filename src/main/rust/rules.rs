@@ -1,5 +1,5 @@
-use crate::neighbourhood::Neighbourhood;
 use crate::flag::Flag;
+use crate::neighbourhood::Neighbourhood;
 
 use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -116,7 +116,7 @@ impl Rules {
             Flag::RDefaultBirth => self.flags.d_birth,
             Flag::RDefaultNeighbourhood => self.flags.d_neighbourhood,
             Flag::RFLoadIncorrect => self.flags.f_load_incorrect,
-            _ => false
+            _ => false,
         }
     }
 

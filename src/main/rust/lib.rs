@@ -1,7 +1,7 @@
 use pyo3::prelude::*;
 
-mod neighbourhood;
 mod flag;
+mod neighbourhood;
 use flag::Flag;
 
 mod rules;

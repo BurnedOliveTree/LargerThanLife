@@ -9,5 +9,5 @@ pub enum Flag {
     RDefaultBirth,
     RDefaultNeighbourhood,
     RFLoadIncorrect,
-    EBFLoadIncorrect
+    EBFLoadIncorrect,
 }

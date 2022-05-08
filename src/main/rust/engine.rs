@@ -1,6 +1,6 @@
+use crate::flag::Flag;
 use crate::neighbourhood::Neighbourhood;
 use crate::rules::Rules;
-use crate::flag::Flag;
 
 use csv::{Error as CsvError, Reader, StringRecord};
 use itertools::{iproduct, izip};
@@ -140,7 +140,7 @@ impl Engine {
     pub fn get_flag(&self, flag_name: Flag) -> bool {
         match flag_name {
             Flag::EBFLoadIncorrect => self.flags.f_load_incorrect,
-            _ => false
+            _ => false,
         }
     }
 

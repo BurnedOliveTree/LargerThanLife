@@ -58,15 +58,18 @@ class Game(Window):
     def set_description_labels(self, rules_path, board_path):
         rules = self._engine.rules
         self._preferences = [
-            self.file_text_label("Rules file: ", rules_path, rules.get_flag(Flag.RFLoadIncorrect)),
+            self.file_text_label(
+                "Rules file: ", rules_path, rules.get_flag(Flag.RFLoadIncorrect)
+            ),
             self.file_text_label(
                 "Board file: ", board_path, self._engine.get_flag(Flag.EBFLoadIncorrect)
             ),
-
             TextLabel(""),
             TextLabel("Rules"),
             self.rule_text_label(f"C: {rules.cell}", rules.get_flag(Flag.RDefaultCell)),
-            self.rule_text_label(f"R: {rules.range}", rules.get_flag(Flag.RDefaultRange)),
+            self.rule_text_label(
+                f"R: {rules.range}", rules.get_flag(Flag.RDefaultRange)
+            ),
             self.rule_text_label(
                 f"S: {rules.survival.start} - {rules.survival.end}",
                 rules.get_flag(Flag.RDefaultSurvival),
