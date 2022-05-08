@@ -7,6 +7,7 @@ IMG_SIZE = 600
 MENU_FPS = 60
 FPS = 1
 BOARD_SIZE = 100
+BACKGROUND_COLOR = (26, 26, 64)
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -16,8 +17,8 @@ pygame.display.set_caption("Larger than Life")
 
 if __name__ == "__main__":
     scene = Scene.MENU
-    menu = Menu(IMG_SIZE, MENU_FPS)
-    game = Game(IMG_SIZE, FPS, BOARD_SIZE)
+    menu = Menu(IMG_SIZE, MENU_FPS, BACKGROUND_COLOR)
+    game = Game(IMG_SIZE, FPS, BOARD_SIZE, BACKGROUND_COLOR)
     while True:
         if scene == Scene.MENU:
             scene = menu.render(screen, clock)

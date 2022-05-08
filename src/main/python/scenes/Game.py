@@ -9,8 +9,10 @@ class Game(Window):
     width_displacement = 150
     height_displacement = 70
 
-    def __init__(self, window_size, FPS, board_size=None):
-        super().__init__(window_size, FPS)
+    def __init__(
+        self, window_size, FPS, board_size=None, background_color=(255, 255, 255)
+    ):
+        super().__init__(window_size, FPS, background_color)
         self.board_size = board_size if board_size is not None else window_size
         self.engine = None
         self.preferences = None
@@ -113,7 +115,7 @@ class Game(Window):
             bitmap = np.array([np.array(xi) for xi in pre_bitmap])
             background = self.get_surface_from_bitmap(bitmap)
 
-            screen.fill((26, 26, 64))
+            screen.fill(self.background_color)
             self.draw_preferences(screen)
             self.return_button.draw(screen)
             self.counter.draw(screen)

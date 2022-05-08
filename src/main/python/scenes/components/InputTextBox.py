@@ -7,12 +7,12 @@ class InputTextBox(Component):
 
     def __init__(self, coordinates, active_color, passive_color, description):
         super().__init__("", coordinates, active_color, passive_color)
-        self.description_label = TextLabel(description)
+        self._description_label = TextLabel(description)
 
     def draw(self, screen):
-        self.description_label.draw(
+        self._description_label.draw(
             screen,
-            self.coordinates[0] - self.description_label.get_width(),
+            self.coordinates[0] - self._description_label.get_width(),
             self.coordinates[1],
         )
         self.text_label.update_text(self.text)

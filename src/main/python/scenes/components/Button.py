@@ -13,12 +13,12 @@ class Button(Component):
         invoke_scene_name=None,
     ):
         super().__init__(text, coordinates, active_color, passive_color, None)
-        self.invoke_scene_name = invoke_scene_name
+        self._invoke_scene_name = invoke_scene_name
 
     def set_status(self, position):
         if self.rect.collidepoint(position):
             self.is_active = True
-            return self.invoke_scene_name
+            return self._invoke_scene_name
         else:
             self.is_active = False
             return None

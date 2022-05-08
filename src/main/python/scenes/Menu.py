@@ -4,8 +4,8 @@ from scenes.components import Button, InputTextBox, TextLabel
 
 
 class Menu(Window):
-    def __init__(self, window_size, FPS):
-        super().__init__(window_size, FPS)
+    def __init__(self, window_size, FPS, background_color=(255, 255, 255)):
+        super().__init__(window_size, FPS, background_color)
         self.rules_text_box = InputTextBox(
             coordinates=(self.window_size // 2, self.window_size * 5 // 12),
             active_color=pygame.Color("#FA58B6"),
@@ -66,7 +66,7 @@ class Menu(Window):
                     elif self.board_text_box.is_active is True:
                         self.board_text_box.get_text_after_event(event)
 
-            screen.fill((26, 26, 64))
+            screen.fill(self.background_color)
             self.title_label.draw(screen)
             self.rules_text_box.draw(screen)
             self.path_text_box.draw(screen)

@@ -59,7 +59,7 @@ C:[int];R[int];S:[range|int];B:[range|int];N:[N|M]
 ```
 For example:
 ```
-C:2;R:1;S:2-3;B:3;N:M
+C:2;R:1;S:2-3;B:3;N:
 C:2;R:1;S:0;B:1;N:N
 C:2;R:7;S:99-199;B:75-170;N:M
 ```
