@@ -107,26 +107,6 @@ impl Default for Rules {
 
 #[pymethods]
 impl Rules {
-    #[new]
-    pub fn new(
-        cell: u8,
-        range: usize,
-        survival: Range,
-        birth: Range,
-        neighbourhood: Neighbourhood,
-    ) -> Self {
-        Rules {
-            cell,
-            range,
-            survival,
-            birth,
-            neighbourhood,
-            flags: RFlags {
-                ..Default::default()
-            },
-        }
-    }
-
     pub fn get_flag(&self, flag_name: &str) -> bool {
         match flag_name {
             "DC" => self.flags.d_cell,
