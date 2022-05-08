@@ -5,7 +5,9 @@ from scenes.components.TextLabel import TextLabel
 class Counter:
     margin = 15
 
-    def __init__(self, value, coordinates, active_color, passive_color, minimum, maximum):
+    def __init__(
+        self, value, coordinates, active_color, passive_color, minimum, maximum
+    ):
         self.value = value
         self.minimum = minimum
         self.maximum = maximum

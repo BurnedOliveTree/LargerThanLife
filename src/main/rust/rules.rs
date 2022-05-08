@@ -231,7 +231,7 @@ mod tests {
             d_birth: false,
             d_neighbourhood: false,
             f_load_incorrect: false,
-        }
+        },
     };
 
     #[test]
@@ -300,7 +300,7 @@ mod tests {
                 survival: Range { start: 2, end: 3 },
                 birth: Range { start: 3, end: 3 },
                 neighbourhood: Neighbourhood::Moore,
-                flags: RFlags { 
+                flags: RFlags {
                     d_cell: true,
                     d_range: true,
                     d_survival: true,
@@ -319,7 +319,7 @@ mod tests {
         assert_eq!(
             parsed_rules,
             Rules {
-                flags: RFlags { 
+                flags: RFlags {
                     d_cell: true,
                     d_range: true,
                     d_survival: true,

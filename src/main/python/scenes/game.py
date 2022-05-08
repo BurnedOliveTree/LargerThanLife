@@ -39,12 +39,14 @@ class Game(Window):
         path = None if path == "" else path
         self.engine = Engine(rules, self.board_size, path)
 
-    def rule_text_label(self, text, flag):
+    @staticmethod
+    def rule_text_label(text, flag):
         return TextLabel(
             text, color=TextLabel.highlight_color if flag is True else None
         )
 
-    def file_text_label(self, default_text, filename, flag):
+    @staticmethod
+    def file_text_label(default_text, filename, flag):
         if flag is True:
             return TextLabel(default_text, color=TextLabel.highlight_color)
         else:
@@ -78,7 +80,9 @@ class Game(Window):
     def get_surface_from_bitmap(self, bitmap):
         bitmap = 255 * (bitmap / bitmap.max())
         grayscale_bitmap = np.empty((*bitmap.shape, 3), dtype=np.uint8)
-        grayscale_bitmap[:, :, 2] = grayscale_bitmap[:, :, 1] = grayscale_bitmap[:, :, 0] = bitmap
+        grayscale_bitmap[:, :, 2] = grayscale_bitmap[:, :, 1] = grayscale_bitmap[
+            :, :, 0
+        ] = bitmap
         bitmap_surface = pygame.surfarray.make_surface(grayscale_bitmap)
         bitmap_size = self.window_size - Game.width_displacement
         scaled_bitmap_surface = pygame.transform.scale(

@@ -205,7 +205,6 @@ mod tests {
         assert_eq!(engine.flags.f_load_incorrect, true);
     }
 
-
     #[test]
     fn test_update_board() {
         let path = String::from("./res/boards/l_test_blinker.csv");

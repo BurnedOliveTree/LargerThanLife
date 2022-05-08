@@ -1,6 +1,6 @@
 import pygame
 from scenes import Scene, Window
-from scenes.components import Button, InputTextBox
+from scenes.components import Button, InputTextBox, TextLabel
 
 
 class Menu(Window):
@@ -38,13 +38,12 @@ class Menu(Window):
             invoke_scene_name=Scene.GAME,
         )
 
-    def draw_title(self, screen):
-        # TODO change to textlabel
-        font = pygame.font.Font(None, 48)
-        text = font.render("Larger than Life", True, pygame.Color("#FA58B6"))
-        text_rect = text.get_rect()
-        text_rect.center = (self.window_size // 2, self.window_size * 2 // 12)
-        screen.blit(text, text_rect)
+        self.title_label = TextLabel(
+            text="Larger than Life",
+            color=pygame.Color("#FA58B6"),
+            coordinates=(self.window_size // 4, self.window_size * 2 // 12),
+            font_size=48,
+        )
 
     def render(self, screen, clock):
         while True:
@@ -68,7 +67,7 @@ class Menu(Window):
                         self.board_text_box.get_text_after_event(event)
 
             screen.fill((26, 26, 64))
-            self.draw_title(screen)
+            self.title_label.draw(screen)
             self.rules_text_box.draw(screen)
             self.path_text_box.draw(screen)
             self.board_text_box.draw(screen)

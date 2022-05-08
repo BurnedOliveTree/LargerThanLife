@@ -29,11 +29,11 @@ class Component:
             self.text_label.get_height() + Component.padding * 2,
         )
 
-    def adjust_width(self, dimesion):
-        if dimesion is None:
+    def adjust_width(self, dimension):
+        if dimension is None:
             return self.text_label.get_width() + Component.padding * 2
         else:
-            return dimesion + Component.padding * 2
+            return dimension + Component.padding * 2
 
     def draw(self, screen):
         pygame.draw.rect(

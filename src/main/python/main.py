@@ -11,7 +11,7 @@ BOARD_SIZE = 100
 pygame.init()
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((IMG_SIZE, IMG_SIZE))
-pygame.mouse.set_visible(1)
+pygame.mouse.set_visible(True)
 pygame.display.set_caption("Larger than Life")
 
 if __name__ == "__main__":
