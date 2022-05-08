@@ -202,7 +202,9 @@ mod tests {
             Some(path),
         );
         assert_eq!(engine.board_size, 600);
+        assert_eq!(engine.flags.f_load_incorrect, true);
     }
+
 
     #[test]
     fn test_update_board() {

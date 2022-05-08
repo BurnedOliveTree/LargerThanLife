@@ -199,12 +199,8 @@ impl Rules {
             .and_then(|json| serde_json::from_str(&json).map_err(Into::into))
             .unwrap_or(Rules {
                 flags: RFlags {
-                    d_cell: true,
-                    d_range: true,
-                    d_survival: true,
-                    d_birth: true,
-                    d_neighbourhood: true,
                     f_load_incorrect: true,
+                    ..Default::default()
                 },
                 ..Default::default()
             })
@@ -228,6 +224,14 @@ mod tests {
             end: 170,
         },
         neighbourhood: Neighbourhood::Moore,
+        flags: RFlags {
+            d_cell: false,
+            d_range: false,
+            d_survival: false,
+            d_birth: false,
+            d_neighbourhood: false,
+            f_load_incorrect: false,
+        }
     };
 
     #[test]
@@ -244,6 +248,14 @@ mod tests {
         assert_eq!(
             parsed_rules,
             Rules {
+                flags: RFlags {
+                    d_cell: false,
+                    d_range: false,
+                    d_survival: false,
+                    d_birth: false,
+                    d_neighbourhood: false,
+                    f_load_incorrect: true,
+                },
                 ..Default::default()
             }
         );
@@ -256,6 +268,14 @@ mod tests {
         assert_eq!(
             parsed_rules,
             Rules {
+                flags: RFlags {
+                    d_cell: false,
+                    d_range: false,
+                    d_survival: false,
+                    d_birth: false,
+                    d_neighbourhood: false,
+                    f_load_incorrect: true,
+                },
                 ..Default::default()
             }
         );
@@ -275,12 +295,19 @@ mod tests {
         assert_eq!(
             parsed_rules,
             Rules {
-                cell: 2,
+                cell: 1,
                 range: 255,
                 survival: Range { start: 2, end: 3 },
                 birth: Range { start: 3, end: 3 },
                 neighbourhood: Neighbourhood::Moore,
-                flags: RFlags { ..Default::default() },
+                flags: RFlags { 
+                    d_cell: true,
+                    d_range: true,
+                    d_survival: true,
+                    d_birth: true,
+                    d_neighbourhood: true,
+                    f_load_incorrect: false,
+                }
             }
         );
     }
@@ -292,6 +319,14 @@ mod tests {
         assert_eq!(
             parsed_rules,
             Rules {
+                flags: RFlags { 
+                    d_cell: true,
+                    d_range: true,
+                    d_survival: true,
+                    d_birth: true,
+                    d_neighbourhood: true,
+                    f_load_incorrect: false,
+                },
                 ..Default::default()
             }
         );
