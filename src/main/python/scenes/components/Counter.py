@@ -6,9 +6,17 @@ class Counter:
     margin = 15
 
     def __init__(
-        self, value, coordinates, active_color, passive_color, minimum, maximum
+        self,
+        value,
+        description,
+        coordinates,
+        active_color,
+        passive_color,
+        minimum,
+        maximum,
     ):
         self._value = value
+        self._description = description
         self._minimum = minimum
         self._maximum = maximum
         self._minus_button = Button(
@@ -38,12 +46,12 @@ class Counter:
     def increase_value(self):
         if self._value < self._maximum:
             self._value += 1
-            self._value_label.update_text(f"{self._value} FPS")
+            self._value_label.update_text(f"{self._value} {self._description}")
 
     def decrease_value(self):
         if self._value > self._minimum:
             self._value -= 1
-            self._value_label.update_text(f"{self._value} FPS")
+            self._value_label.update_text(f"{self._value} {self._description}")
 
     def draw(self, screen):
         self._minus_button.draw(screen)

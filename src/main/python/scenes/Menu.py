@@ -44,7 +44,7 @@ class Menu(Window):
             coordinates=(self.window_size // 4, self.window_size * 2 // 12),
             font_size=48,
         )
-    
+
     def get_rules_path(self):
         return self._path_text_box.get_text()
 
@@ -53,7 +53,6 @@ class Menu(Window):
 
     def get_board_path(self):
         return self._board_text_box.get_text()
-    
 
     def render(self, screen, clock):
         while True:

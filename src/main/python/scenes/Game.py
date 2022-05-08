@@ -30,6 +30,7 @@ class Game(Window):
 
         self._counter = Counter(
             FPS,
+            description="FPS",
             coordinates=(self.window_size - 150, Counter.margin),
             active_color=pygame.Color("#FA58B6"),
             passive_color=pygame.Color("#7A0BC0"),

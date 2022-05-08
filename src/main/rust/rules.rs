@@ -37,7 +37,6 @@ pub struct Rules {
     pub birth: Range,
     #[pyo3(get)]
     pub neighbourhood: Neighbourhood,
-    #[pyo3(get)]
     #[serde(skip)]
     pub flags: RFlags,
 }
