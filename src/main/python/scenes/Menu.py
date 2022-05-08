@@ -60,11 +60,11 @@ class Menu(Window):
                         return game_screen
                 if event.type == pygame.KEYDOWN:
                     if self.rules_text_box.is_active is True:
-                        self.rules_text_box.get_text_after_event(event)
+                        self.rules_text_box.set_text_after_event(event)
                     elif self.path_text_box.is_active is True:
-                        self.path_text_box.get_text_after_event(event)
+                        self.path_text_box.set_text_after_event(event)
                     elif self.board_text_box.is_active is True:
-                        self.board_text_box.get_text_after_event(event)
+                        self.board_text_box.set_text_after_event(event)
 
             screen.fill(self.background_color)
             self.title_label.draw(screen)

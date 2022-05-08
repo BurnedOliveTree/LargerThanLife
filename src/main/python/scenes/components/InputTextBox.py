@@ -12,22 +12,25 @@ class InputTextBox(Component):
     def draw(self, screen):
         self._description_label.draw(
             screen,
-            self.coordinates[0] - self._description_label.get_width(),
-            self.coordinates[1],
+            self._coordinates[0] - self._description_label.get_width(),
+            self._coordinates[1],
         )
-        self.text_label.update_text(self.text)
-        self.rect.w = max(
-            self.text_label.get_width() + Component.padding, InputTextBox.default_width
+        self._text_label.update_text(self._text)
+        self._rect.w = max(
+            self._text_label.get_width() + Component.padding, InputTextBox.default_width
         )
 
         self.change_color()
-        pygame.draw.rect(screen, self.color, self.rect, Component.border_width)
-        self.text_label.draw(
-            screen, self.rect.x + Component.padding, self.rect.y + Component.padding
+        pygame.draw.rect(screen, self._color, self._rect, Component.border_width)
+        self._text_label.draw(
+            screen, self._rect.x + Component.padding, self._rect.y + Component.padding
         )
 
-    def get_text_after_event(self, event):
+    def get_text(self):
+        return self._text
+
+    def set_text_after_event(self, event):
         if event.key == pygame.K_BACKSPACE:
-            self.text = self.text[:-1]
+            self._text = self._text[:-1]
         else:
-            self.text += event.unicode
+            self._text += event.unicode

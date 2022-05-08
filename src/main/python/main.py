@@ -23,14 +23,15 @@ if __name__ == "__main__":
         if scene == Scene.MENU:
             scene = menu.render(screen, clock)
         elif scene == Scene.GAME:
-            if menu.path_text_box.text != "":
-                rules = Rules.from_file(menu.path_text_box.text)
+            path_text = menu.path_text_box.get_text()
+            input_text = menu.rules_text_box.get_text()
+            board_text = menu.board_text_box.get_text()
+            if path_text != "":
+                rules = Rules.from_file(path_text)
             else:
-                rules = Rules.from_str(menu.rules_text_box.text)
-            game.set_rules(rules, menu.board_text_box.text)
-            game.set_description_labels(
-                menu.path_text_box.text, menu.board_text_box.text
-            )
+                rules = Rules.from_str(input_text)
+            game.set_rules(rules, board_text)
+            game.set_description_labels(path_text, board_text)
             scene = game.render(screen, clock)
         elif scene is None:
             sys.exit()

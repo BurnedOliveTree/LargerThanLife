@@ -16,9 +16,12 @@ class Button(Component):
         self._invoke_scene_name = invoke_scene_name
 
     def set_status(self, position):
-        if self.rect.collidepoint(position):
+        if self._rect.collidepoint(position):
             self.is_active = True
             return self._invoke_scene_name
         else:
             self.is_active = False
             return None
+
+    def get_collidepoint(self, position):
+        return self._rect.collidepoint(position)

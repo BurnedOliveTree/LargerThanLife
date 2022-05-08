@@ -8,7 +8,7 @@ class Counter:
     def __init__(
         self, value, coordinates, active_color, passive_color, minimum, maximum
     ):
-        self.value = value
+        self._value = value
         self._minimum = minimum
         self._maximum = maximum
         self._minus_button = Button(
@@ -29,21 +29,21 @@ class Counter:
         )
 
     def set_status(self, position):
-        if self._minus_button.rect.collidepoint(position):
+        if self._minus_button.get_collidepoint(position):
             self.decrease_value()
-        elif self._plus_button.rect.collidepoint(position):
+        elif self._plus_button.get_collidepoint(position):
             self.increase_value()
-        return self.value
+        return self._value
 
     def increase_value(self):
-        if self.value < self._maximum:
-            self.value += 1
-            self._value_label.update_text(f"{self.value} FPS")
+        if self._value < self._maximum:
+            self._value += 1
+            self._value_label.update_text(f"{self._value} FPS")
 
     def decrease_value(self):
-        if self.value > self._minimum:
-            self.value -= 1
-            self._value_label.update_text(f"{self.value} FPS")
+        if self._value > self._minimum:
+            self._value -= 1
+            self._value_label.update_text(f"{self._value} FPS")
 
     def draw(self, screen):
         self._minus_button.draw(screen)

@@ -12,43 +12,43 @@ class Component:
     def __init__(
         self, text, coordinates, active_color, passive_color, width=default_width
     ):
-        self.text = text
-        self.coordinates = coordinates
+        self._text = text
+        self._coordinates = coordinates
         self.is_active = False
 
-        self.active_color = active_color
-        self.passive_color = passive_color
-        self.color = self.passive_color
+        self._active_color = active_color
+        self._passive_color = passive_color
+        self._color = self._passive_color
 
-        self.text_label = TextLabel(text)
+        self._text_label = TextLabel(text)
 
-        self.rect = pygame.Rect(
+        self._rect = pygame.Rect(
             coordinates[0] - Component.padding,
             coordinates[1] - Component.padding,
             self.adjust_width(width),
-            self.text_label.get_height() + Component.padding * 2,
+            self._text_label.get_height() + Component.padding * 2,
         )
 
     def adjust_width(self, dimension):
         if dimension is None:
-            return self.text_label.get_width() + Component.padding * 2
+            return self._text_label.get_width() + Component.padding * 2
         else:
             return dimension + Component.padding * 2
 
     def draw(self, screen):
         pygame.draw.rect(
-            screen, self.color, self.rect, border_radius=Component.border_radius
+            screen, self._color, self._rect, border_radius=Component.border_radius
         )
-        self.text_label.draw(screen, self.coordinates[0], self.coordinates[1])
+        self._text_label.draw(screen, self._coordinates[0], self._coordinates[1])
 
     def set_status(self, position):
-        if self.rect.collidepoint(position):
+        if self._rect.collidepoint(position):
             self.is_active = True
         else:
             self.is_active = False
 
     def change_color(self):
         if self.is_active:
-            self.color = self.active_color
+            self._color = self._active_color
         else:
-            self.color = self.passive_color
+            self._color = self._passive_color
