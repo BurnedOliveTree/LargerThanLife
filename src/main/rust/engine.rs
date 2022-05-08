@@ -1,5 +1,6 @@
 use crate::neighbourhood::Neighbourhood;
 use crate::rules::Rules;
+use crate::flag::Flag;
 
 use csv::{Error as CsvError, Reader, StringRecord};
 use itertools::{iproduct, izip};
@@ -136,10 +137,10 @@ impl Engine {
         self.board.to_vec()
     }
 
-    pub fn get_flag(&self, flag_name: &str) -> bool {
+    pub fn get_flag(&self, flag_name: Flag) -> bool {
         match flag_name {
-            "FNF" => self.flags.f_load_incorrect,
-            _ => false,
+            Flag::EBFLoadIncorrect => self.flags.f_load_incorrect,
+            _ => false
         }
     }
 

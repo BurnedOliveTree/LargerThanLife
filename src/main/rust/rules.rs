@@ -1,4 +1,5 @@
 use crate::neighbourhood::Neighbourhood;
+use crate::flag::Flag;
 
 use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -107,15 +108,15 @@ impl Default for Rules {
 
 #[pymethods]
 impl Rules {
-    pub fn get_flag(&self, flag_name: &str) -> bool {
+    pub fn get_flag(&self, flag_name: Flag) -> bool {
         match flag_name {
-            "DC" => self.flags.d_cell,
-            "DR" => self.flags.d_range,
-            "DS" => self.flags.d_survival,
-            "DB" => self.flags.d_birth,
-            "DN" => self.flags.d_neighbourhood,
-            "FNF" => self.flags.f_load_incorrect,
-            _ => false,
+            Flag::RDefaultCell => self.flags.d_cell,
+            Flag::RDefaultRange => self.flags.d_range,
+            Flag::RDefaultSurvival => self.flags.d_survival,
+            Flag::RDefaultBirth => self.flags.d_birth,
+            Flag::RDefaultNeighbourhood => self.flags.d_neighbourhood,
+            Flag::RFLoadIncorrect => self.flags.f_load_incorrect,
+            _ => false
         }
     }
 
