@@ -23,9 +23,9 @@ if __name__ == "__main__":
         if scene == Scene.MENU:
             scene = menu.render(screen, clock)
         elif scene == Scene.GAME:
-            path_text = menu.path_text_box.get_text()
-            input_text = menu.rules_text_box.get_text()
-            board_text = menu.board_text_box.get_text()
+            path_text = menu.get_rules_path()
+            input_text = menu.get_rules_str()
+            board_text = menu.get_board_path()
             if path_text != "":
                 rules = Rules.from_file(path_text)
             else:

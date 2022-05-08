@@ -16,7 +16,6 @@ pub struct Engine {
     rules: Rules,
     board: Grid,
     board_size: usize,
-    #[pyo3(get)]
     flags: EFlags,
 }
 

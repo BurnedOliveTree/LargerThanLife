@@ -27,7 +27,6 @@ pub struct Range {
 #[pyclass]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Rules {
-    // TODO check
     #[pyo3(get)]
     pub cell: u8,
     #[pyo3(get)]

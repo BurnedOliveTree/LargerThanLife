@@ -13,11 +13,11 @@ class Game(Window):
         self, window_size, FPS, board_size=None, background_color=(255, 255, 255)
     ):
         super().__init__(window_size, FPS, background_color)
-        self.board_size = board_size if board_size is not None else window_size
-        self.engine = None
-        self.preferences = None
+        self._board_size = board_size if board_size is not None else window_size
+        self._engine = None
+        self._preferences = None
 
-        self.return_button = Button(
+        self._return_button = Button(
             text="Return",
             coordinates=(
                 Button.margin,
@@ -28,7 +28,7 @@ class Game(Window):
             invoke_scene_name=Scene.MENU,
         )
 
-        self.counter = Counter(
+        self._counter = Counter(
             FPS,
             coordinates=(self.window_size - 150, Counter.margin),
             active_color=pygame.Color("#FA58B6"),
@@ -39,7 +39,7 @@ class Game(Window):
 
     def set_rules(self, rules: Rules, path: str):
         path = None if path == "" else path
-        self.engine = Engine(rules, self.board_size, path)
+        self._engine = Engine(rules, self._board_size, path)
 
     @staticmethod
     def rule_text_label(text, flag):
@@ -55,11 +55,11 @@ class Game(Window):
             return TextLabel(default_text + filename)
 
     def set_description_labels(self, rules_path, board_path):
-        rules = self.engine.rules
-        self.preferences = [
+        rules = self._engine.rules
+        self._preferences = [
             self.file_text_label("Rules file: ", rules_path, rules.get_flag("FNF")),
             self.file_text_label(
-                "Board file: ", board_path, self.engine.get_flag("FNF")
+                "Board file: ", board_path, self._engine.get_flag("FNF")
             ),
             TextLabel(""),
             TextLabel("Rules"),
@@ -95,8 +95,8 @@ class Game(Window):
 
     def draw_preferences(self, screen):
         height = TextLabel.margin
-        text_height = self.preferences[0].get_height()
-        for preference in self.preferences:
+        text_height = self._preferences[0].get_height()
+        for preference in self._preferences:
             preference.draw(screen, TextLabel.margin, height)
             height += TextLabel.padding + text_height
 
@@ -106,21 +106,21 @@ class Game(Window):
                 if event.type == pygame.QUIT:
                     return None
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    next_screen = self.return_button.set_status(event.pos)
-                    self.FPS = self.counter.set_status(event.pos)
+                    next_screen = self._return_button.set_status(event.pos)
+                    self.FPS = self._counter.set_status(event.pos)
                     if next_screen is not None:
                         return next_screen
 
-            pre_bitmap = self.engine.board()
+            pre_bitmap = self._engine.board()
             bitmap = np.array([np.array(xi) for xi in pre_bitmap])
             background = self.get_surface_from_bitmap(bitmap)
 
             screen.fill(self.background_color)
             self.draw_preferences(screen)
-            self.return_button.draw(screen)
-            self.counter.draw(screen)
+            self._return_button.draw(screen)
+            self._counter.draw(screen)
             screen.blit(background, (Game.width_displacement, Game.height_displacement))
 
             pygame.display.update()
-            self.engine.update()
+            self._engine.update()
             clock.tick(self.FPS)
