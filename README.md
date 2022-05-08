@@ -37,9 +37,17 @@ To specify rules in a file, create a json structure:
 {
     "cell": [int -> 2] ,                     // (0-255) cell state between 0 and provided number
     "range": [int -> 10],                    // (0-255) 
-    "survival": [string -> "2" | "4-5"],     //  >0
-    "birth": [string ->"3" | "2-3"],         //  >0  affects the value of the cell field
-    "neighbourhood": [string -> "M" | "N"],  //  M | N
+    "survival": {
+        "start": [int -> 2],                 //  >0
+        "end": [int -> 222]                  //  >0
+    },
+    "birth": {                               //  >0  affects the value of the cell field
+        "start": [int -> 2],                 //  >0 
+        "end": [int -> 2],                   //  >0
+    },
+    "neighbourhood": {
+        "type": [string -> "Moore"]         // Moore | VonNeumann
+    }
 }
 ```
 After arrow you can see some examples.
