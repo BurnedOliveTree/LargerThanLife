@@ -2,7 +2,7 @@ use crate::flag::Flag;
 use crate::neighbourhood::Neighbourhood;
 use crate::rules::Rules;
 
-use csv::{Error as CsvError, Reader, StringRecord};
+use csv::Reader;
 use itertools::{iproduct, izip};
 use pyo3::prelude::*;
 use rand::{distributions::Uniform, Rng};
@@ -94,16 +94,11 @@ impl Engine {
 
     fn from_file(path: String) -> Result<(Grid, usize), Box<dyn Error>> {
         let mut reader = Reader::from_path(path)?;
-        let data: Grid = reader
-            .records()
-            .map(|record: Result<StringRecord, CsvError>| -> Vec<u8> {
-                record
-                    .unwrap() // TODO
-                    .into_iter()
-                    .map(|field| field.parse::<u8>().unwrap()) // TODO
-                    .collect()
-            })
-            .collect();
+        let mut data = vec![];
+        for result in reader.deserialize() {
+            let record: Vec<u8> = result?;
+            data.push(record)
+        }
         let len = data.len();
         Ok((data, len))
     }
@@ -149,6 +144,7 @@ impl Engine {
 
         for (x, column) in count.iter_mut().enumerate() {
             for (y, value) in column.iter_mut().enumerate() {
+                // unwrap is safe here because we iterate over the same board, and this method will only return err on index out of bounds
                 *value = self.count_alive_neighbours((x, y)).unwrap();
             }
         }

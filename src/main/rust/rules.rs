@@ -49,6 +49,7 @@ trait RangeParser {
 impl RangeParser for &str {
     fn from_str(&self) -> Result<Range, ParseIntError> {
         if self.contains('-') {
+            // unwrap is safe here, because we check if the strings contains '-' earlier
             let (value1, value2) = self.split_once('-').unwrap();
             Ok(Range {
                 start: value1.parse::<u16>()?,
