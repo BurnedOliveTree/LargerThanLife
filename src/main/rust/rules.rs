@@ -65,14 +65,16 @@ impl RangeParser for &str {
 }
 
 trait Normalizable {
-    fn normalize(self, lower: Self, upper: Self) -> Self;
+    fn normalize(self, lower: Self, upper: Self, flag: &mut bool) -> Self;
 }
 
 impl Normalizable for u8 {
-    fn normalize(self, lower: u8, upper: u8) -> Self {
+    fn normalize(self, lower: u8, upper: u8, flag: &mut bool) -> Self {
         if self < lower {
+            *flag = true;
             lower
         } else if self > upper {
+            *flag = true;
             upper
         } else {
             self
@@ -81,10 +83,12 @@ impl Normalizable for u8 {
 }
 
 impl Normalizable for usize {
-    fn normalize(self, lower: usize, upper: usize) -> Self {
+    fn normalize(self, lower: usize, upper: usize, flag: &mut bool) -> Self {
         if self < lower {
+            *flag = true;
             lower
         } else if self > upper {
+            *flag = true;
             upper
         } else {
             self
@@ -142,14 +146,14 @@ impl Rules {
                         flags.d_cell = true;
                     })
                     .unwrap_or(default_rules.cell)
-                    .normalize(2, 255), // TODO hoist the flag
+                    .normalize(2, 255, &mut flags.d_cell),
                 range: get_rule("R")
                     .parse::<usize>()
                     .map_err(|_| {
                         flags.d_range = true;
                     })
                     .unwrap_or(default_rules.range)
-                    .normalize(1, 255), // TODO hoist the flag
+                    .normalize(1, 255, &mut flags.d_range),
                 survival: get_rule("S")
                     .from_str()
                     .map_err(|_| {
