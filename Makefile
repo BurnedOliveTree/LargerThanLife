@@ -3,6 +3,7 @@ install:
 	poetry shell
 
 build: install
+	cargo update
 	poetry update
 	maturin build
 
