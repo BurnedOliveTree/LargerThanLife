@@ -275,7 +275,7 @@ mod tests {
         assert_eq!(
             parsed_rules,
             Rules {
-                cell: 1,
+                cell: 2,
                 range: 255,
                 survival: Range { start: 2, end: 3 },
                 birth: Range { start: 3, end: 3 },

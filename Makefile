@@ -3,6 +3,7 @@ install:
 	poetry shell
 
 build: install
+	poetry update
 	maturin build
 
 dev: install
