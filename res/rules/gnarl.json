@@ -1,0 +1,15 @@
+{
+    "cell": 2,
+    "range": 1,
+    "survival": {
+        "start": 0,
+        "end": 0
+    },
+    "birth": {
+        "start": 1,
+        "end": 1
+    },
+    "neighbourhood": {
+        "type": "VonNeumann"
+    }
+}

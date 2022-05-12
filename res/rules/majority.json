@@ -1,0 +1,15 @@
+{
+    "cell": 2,
+    "range": 4,
+    "survival": {
+        "start": 40,
+        "end": 80
+    },
+    "birth":{
+        "start": 41,
+        "end": 81
+    },
+    "neighbourhood": {
+        "type": "Moore"
+    }
+}
