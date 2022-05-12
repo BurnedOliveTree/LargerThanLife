@@ -43,11 +43,11 @@ pub struct Rules {
 }
 
 trait RangeParser {
-    fn from_str(&self) -> Result<Range, ParseIntError>;
+    fn to_range(&self) -> Result<Range, ParseIntError>;
 }
 
 impl RangeParser for &str {
-    fn from_str(&self) -> Result<Range, ParseIntError> {
+    fn to_range(&self) -> Result<Range, ParseIntError> {
         if self.contains('-') {
             // unwrap is safe here, because we check if the strings contains '-' earlier
             let (value1, value2) = self.split_once('-').unwrap();
@@ -155,13 +155,13 @@ impl Rules {
                     .unwrap_or(default_rules.range)
                     .normalize(1, 255, &mut flags.d_range),
                 survival: get_rule("S")
-                    .from_str()
+                    .to_range()
                     .map_err(|_| {
                         flags.d_survival = true;
                     })
                     .unwrap_or(default_rules.survival),
                 birth: get_rule("B")
-                    .from_str()
+                    .to_range()
                     .map_err(|_| {
                         flags.d_birth = true;
                     })
